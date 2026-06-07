@@ -1,0 +1,53 @@
+---
+title: "RamyJungle"
+publishedAt: "2024-06-25"
+summary: "Wildlife conservation platform for Indonesia's endangered species, featuring parallax scroll effects, an interactive habitat map, and a REST API — all powered by PHP and MySQL."
+images:
+  - "/images/projects/jungle/jungle1.png"
+team:
+  - name: "Afrizal Ramy Diaman"
+    role: "Software Engineer"
+    avatar: "/images/avatar.png"
+    linkedIn: " "
+link: "https://github.com/Afrizal236/RamyJungle.git"
+techStack:
+  - "HTML"
+  - "CSS"
+  - "PHP"
+  - "MySQL"
+  - "XAMPP"
+  - "Leaflet.js"
+category: "Full-Stack Web Development"
+---
+
+## Overview
+
+RamyJungle is a wildlife conservation web platform focused on raising awareness about endangered species in Indonesia. Built using PHP, MySQL, and vanilla HTML/CSS/JavaScript, it delivers an interactive and educational experience through a parallax scrolling interface, an interactive habitat map, and a structured REST API — all designed to run on a local server via XAMPP, making it accessible for practical deployment without complex infrastructure.
+
+## Key Features
+
+- **Dynamic Fauna Catalog**: Displays detailed profiles of Indonesia's endangered animals fetched directly from a MySQL database, including latin names, conservation status, population data, and motivational quotes.
+- **Parallax Scroll Experience**: Implements a multi-layer parallax effect on the landing page using layered PNG assets (hill1–hill5), creating an immersive jungle atmosphere as users scroll.
+- **Interactive Habitat Map**: Integrates Leaflet.js to render an interactive map of Indonesia, plotting real wildlife habitat locations with markers and popups pulled from the database via REST API.
+- **REST API Architecture**: Provides two structured PHP-based REST APIs (`API.php` for habitats, `APII.php` for animals) supporting filtering, search by name, status-based filtering, and pagination.
+- **Conservation Program Page**: Dynamically renders conservation cards from the `wildlife_habitats` table, showcasing national parks and their protected species.
+
+## Technologies Used
+
+- **PHP**: The primary server-side language handling routing, database queries, and REST API responses.
+- **MySQL (via XAMPP)**: Relational database storing two core tables — `kewan` (animals) and `wildlife_habitats` — with structured data on species, locations, and conservation status.
+- **HTML/CSS/JavaScript**: Frontend stack handling UI rendering, parallax scroll logic, hamburger navigation, and dynamic content interaction.
+- **Leaflet.js**: An open-source JavaScript library used to render the interactive wildlife habitat map with custom markers and popups.
+- **REST API (Custom PHP)**: Two custom-built API endpoints serving JSON responses for animal and habitat data, supporting multiple query actions including pagination and statistics.
+- **XAMPP**: Local server environment used to run Apache and MySQL, enabling the full stack to operate without cloud infrastructure.
+
+## Challenges and Learnings
+
+The project began with challenges in structuring a clean relational database schema that could serve both the frontend UI and the REST API efficiently — this underscored the importance of designing data models with both display and query needs in mind. During frontend development, implementing the multi-layer parallax effect required careful z-index management and scroll event tuning to achieve smooth, natural movement across all five hill layers. In the API development phase, managing CORS headers and ensuring consistent JSON responses across different query actions taught the importance of standardizing API response structures from the start. On the map integration side, dynamically fetching and plotting habitat coordinates from the database onto Leaflet.js markers highlighted the value of keeping geographic data normalized and accurate. Overall, this project reinforced that building a full-stack web application — even without modern frameworks — demands disciplined separation of concerns, clean data architecture, and iterative testing across every layer of the stack.
+
+## Project Repository
+
+Clone the git repository:
+```bash
+git clone https://github.com/Afrizal236/RamyJungle.git
+```

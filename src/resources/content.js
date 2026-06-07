@@ -35,12 +35,12 @@ const social = [
   {
     name: "LinkedIn",
     icon: "linkedin",
-    link: "https://www.linkedin.com/in/muhammadwildanyulioardana/",
+    link: "",
   },
   {
     name: "Instagram",
     icon: "instagram",
-    link: "https://www.instagram.com/ardnskyyy/",
+    link: "",
   },
   {
     name: "Email",
@@ -51,7 +51,7 @@ const social = [
 
 const home = {
   path: "/",
-  image: "/images/og/home.jpg",
+  image: "/images/og/home.png",
   label: "Home",
   title: `${person.name} Portfolio`,
   description: `Portfolio website showcasing my work as a ${person.role}`,

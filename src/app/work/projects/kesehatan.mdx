@@ -1,0 +1,101 @@
+---
+title: "RamySehat"
+publishedAt: "2024-08-12"
+summary: "A health consultation web platform with AI chatbot integration, complete role-based authentication, and an admin dashboard for managing contact messages — built with PHP and MySQL."
+images:
+  - "/images/projects/kesehatan/kesehatan1.png"
+  - "/images/projects/kesehatan/kesehatan2.png"
+  - "/images/projects/kesehatan/kesehatan3.png"
+
+team:
+  - name: "Afrizal Ramy Diaman"
+    role: "Software Engineer"
+    avatar: "/images/avatar.png"
+    linkedIn: " "
+link: "https://github.com/Afrizal236/RamySehat.git"
+techStack:
+  - "HTML"
+  - "CSS"
+  - "PHP"
+  - "MySQL"
+  - "XAMPP"
+category: "Full-Stack Web Development"
+---
+
+## Overview
+
+RamySehat is a full-stack health consultation web platform built with PHP,
+MySQL, and vanilla HTML/CSS/JavaScript. It provides users with an AI-powered
+health chatbot interface, a complete authentication system with role-based
+access control, and a contact management system — all running on a local
+XAMPP server. The platform supports two user roles: regular users who can
+access the consultation chatbot after login, and admins who can manage
+incoming contact messages through a dedicated admin dashboard.
+
+## Key Features
+
+- **Role-Based Authentication System**: Implements a complete user
+  authentication flow including signup, login, session management, and
+  logout, with distinct access levels for regular users and administrators.
+- **Admin Contact Dashboard**: Provides a dedicated admin panel where
+  administrators can view, mark as read, and delete incoming contact form
+  submissions, complete with status tracking (unread, read, replied) and
+  message statistics.
+- **AI Health Chatbot Interface**: Authenticated users are directed to an
+  interactive chatbot page for health consultations, making the platform
+  practical and purpose-driven beyond just authentication.
+- **Secure Password Handling**: All user passwords are stored using PHP's
+  `password_hash()` with bcrypt, and verified via `password_verify()`,
+  ensuring no plaintext credentials are ever stored in the database.
+- **Contact Form with Backend Validation**: A fully functional contact form
+  with server-side input sanitization, format validation, and PDO-prepared
+  statements to prevent SQL injection before storing submissions to the
+  database.
+- **Forgot Password Flow**: Includes a dedicated forgot password module,
+  supporting account recovery for registered users.
+
+## Technologies Used
+
+- **PHP (Native)**: Server-side language handling authentication logic,
+  session management, REST-style endpoints, and admin operations — all
+  without any framework.
+- **MySQL (via XAMPP)**: Relational database storing two core tables —
+  `users` (with role-based access) and `contact_messages` (with status
+  tracking) — structured with proper indexes for performance.
+- **PDO (PHP Data Objects)**: Used for all database interactions with
+  prepared statements, charset enforcement (utf8mb4), and exception-based
+  error handling.
+- **HTML/CSS/JavaScript**: Frontend stack for all user-facing pages
+  including login, signup, dashboard, contact form, and the chatbot
+  interface.
+- **Session Management (PHP Sessions)**: Handles persistent login state
+  across pages, with role validation on protected routes to enforce access
+  control.
+- **XAMPP**: Local server environment running Apache and MySQL, enabling
+  the complete stack to operate without cloud infrastructure.
+
+## Challenges and Learnings
+
+The project began with the challenge of designing a clean role-based access
+system in native PHP without a framework — requiring careful manual session
+validation on every protected page. This underscored the importance of
+centralizing authentication logic in a shared `config.php` rather than
+duplicating checks across files. During the database design phase,
+structuring the `contact_messages` table with a proper status enum
+(`unread`, `read`, `replied`) and indexed columns taught the value of
+designing schemas with both query performance and UI state management in
+mind. On the security side, implementing proper password hashing, input
+sanitization, and PDO prepared statements across all form handlers
+highlighted that even simple CRUD applications require disciplined security
+practices at every data entry point. Overall, this project reinforced that
+building a production-ready authentication system — even without modern
+frameworks — demands meticulous attention to session lifecycle, role
+enforcement, and secure data handling at every layer.
+
+## Project Repository
+
+Curious about the detailed implementation? I have published the entire source code of this project on GitHub. You are free to view, download, or even develop it further.
+
+```bash
+git clone https://github.com/Afrizal236/RamySehat.git
+```
