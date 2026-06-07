@@ -8,7 +8,7 @@ const person = {
   },
   role: "Software Engineer",
   avatar: "/images/avatar.png",
-  email: "muhammad.wildanya@gmail.com",
+  email: "ramydiaman@gmail.com",
   location: "Asia/Jakarta", // Expecting the IANA time zone identifier, e.g., 'Europe/Vienna'
   languages: ["English", "Bahasa"], // optional: Leave the array empty if you don't want to display languages
 };
@@ -30,7 +30,7 @@ const social = [
   {
     name: "GitHub",
     icon: "github",
-    link: "https://github.com/muhammadwildanskyyy",
+    link: "https://github.com/Afrizal236",
   },
   {
     name: "LinkedIn",
@@ -67,9 +67,9 @@ const home = {
   },
   subline: (
     <>
-      Hi! I’m {person.name}, a Software Engineer passionate about building reliable,
-      user-focused applications and transforming complex challenges into
-      efficient digital solutions.
+      Hi! I’m {person.name}, a Software Engineer passionate about building
+      reliable, user-focused applications and transforming complex challenges
+      into efficient digital solutions.
     </>
   ),
 };
@@ -95,11 +95,13 @@ const about = {
     title: "Introduction",
     description: (
       <>
-        As a full-stack Software Engineer with a focus on the backend, I design
-        the foundation of systems that are not only robust, but also
-        revolutionary. With expertise in Machine Learning, I turn data into
-        intelligence, pushing the boundaries of technology to create
-        transformative solutions.
+        As a Full-Stack Software Engineer with expertise across both frontend
+        and backend, I build end-to-end systems that are not only robust, but
+        also seamless and intuitive. With hands-on internship experience as a
+        Data Scientist and AI Engineer, I turn raw data into intelligence and
+        ship AI-powered products — from crafting responsive, interactive
+        interfaces to designing scalable server-side architectures that drive
+        real business impact.
       </>
     ),
   },
@@ -108,81 +110,114 @@ const about = {
     title: "Work Experience",
     experiences: [
       {
-        company: "PT Arka Data Pratama",
-        timeframe: "August 2025 - November 2025",
-        role: "Frontend Developer Intern",
+        company: "Diskominfo Surabaya",
+        timeframe: "August 2025 - December 2025",
+        role: "Website Developer Intern",
         achievements: [
           <>
-            <strong>Frontend & UI Development:</strong> Developed an interactive and responsive user interface for the Real-time Monitoring Dashboard and Intelligent Drilling Dashboard projects using React.js with CSS Grid-based layout implementations.
+            <strong>UI/UX Design & Prototyping:</strong> Designed wireframes and
+            high-fidelity mockups for the Surabaya Regional Portal and PPID
+            Website using Figma, including multi-level navigation
+            (region–district–village), interactive map visualization, and a
+            complete design system covering typography, color scheme, spacing,
+            and reusable UI components.
           </>,
           <>
-            <strong>High-Performance Data Visualization:</strong> Resolved performance bottlenecks in large-scale data rendering by refactoring chart visualizations from ECharts (SVG-based) to D3.js using an HTML Canvas approach. This optimization enabled the dashboard to process and render tens of thousands of real-time data points without lag.
+            <strong>Frontend Development with Next.js:</strong> Developed
+            tourism information pages (Event, Hotel, Heritage, and Culinary) on
+            the Surabaya.go.id website using Next.js with React.js and
+            TypeScript, implementing dynamic components, responsive layouts with
+            Material-UI, and interactive navigation features.
           </>,
           <>
-            <strong>Advanced Chart Interactivity:</strong> Designed and implemented advanced interactivity across various chart types (such as Scatter, Line, and Combo Charts) using D3.js, including Zoom, Pan, Tooltip, and Brush selection features.
+            <strong>API Integration & Data Fetching:</strong> Integrated the
+            frontend with backend REST APIs using React Query (useQuery hook)
+            for asynchronous data fetching, complete with caching (staleTime: 10
+            minutes), retry mechanism, and loading/error state handling for
+            dynamic content rendering.
           </>,
           <>
-            <strong>Complex Data Synchronization:</strong> Built cross-chart interaction synchronization (Brushing and Linking) in the "Depth-Based Analysis" module, where zoom or pan navigation on one chart is automatically applied to other comparison charts.
+            <strong>ERP System Customization (Odoo):</strong> Customized the
+            PPID module on the Odoo ERP platform by developing custom XML-based
+            view layouts, QWeb templates for frontend pages, and Python logic to
+            manage data structure and system functionality in accordance with
+            the approved Figma design.
           </>,
           <>
-            <strong>State Management & Dynamic Filtering:</strong> Managed global application state using the React Context API for multi-well navigation features. Developed a dynamic cascading filter system for granular server data queries using Cube.js integration.
+            <strong>Statistical Data Visualization:</strong> Designed an
+            interactive regional comparison feature concept for the Surabaya
+            Regional Portal, enabling side-by-side analysis of key indicators
+            such as population density, area size, and public facility
+            availability across districts and villages.
           </>,
           <>
-            <strong>Client-Side Data Processing:</strong> Developed raw data import functionality by parsing Excel files directly on the client side using the SheetJS library, complete with a preview table feature before the data is uploaded to the database.
-          </>,
-          <>
-            <strong>Data Export Capabilities:</strong> Implemented filtered JSON data extraction and conversion features to CSV format to facilitate reporting and advanced offline data analysis needs for engineers.
+            <strong>Design System Implementation:</strong> Developed and
+            documented a comprehensive design system as a visual and technical
+            reference for Surabaya.go.id, ensuring consistency across
+            components, interaction patterns, and multi-device responsiveness
+            throughout the portal's various modules.
           </>,
         ],
-        images: [{
-          src: "/images/work/frontend-developer1.jpeg",
-          alt: "All Team",
-          width: 16,
-          height: 9,
-        },
-        {
-          src: "/images/work/frontend-developer2.jpeg",
-          alt: "me",
-          width: 16,
-          height: 9,
-        },],
+        images: [
+          {
+            src: "/images/work/website-developer1.jpeg",
+            alt: "All Team",
+            width: 16,
+            height: 9,
+          },
+          {
+            src: "/images/work/website-developer2.jpg",
+            alt: "me",
+            width: 16,
+            height: 9,
+          },
+        ],
       },
       {
-        company: "Dewo Robotic",
-        timeframe: "2024 - Present",
-        role: "Senior Software Engineer, Wheeled Soccer Robot Division ",
+        company: "PT Mitra Talenta Grup (Celerates)",
+        timeframe: "Maret 2026 - June 2026",
+        role: "Data scientist & AI Engineer Intern",
         achievements: [
           <>
-            Wheeled Soccer Robots: I'm actively involved in the research and
-            development (R&D) of software for wheeled soccer robots, focusing on
-            creating intelligent and agile autonomous systems.
+            <strong>Data Collection & Preprocessing:</strong> Collected,
+            cleaned, and transformed raw datasets into structured formats ready
+            for analysis and model training, ensuring data quality and
+            consistency as the foundation for accurate and reliable AI-driven
+            solutions.
           </>,
           <>
-            Real-time Communication Architectures: My work includes R&D of
-            Real-time Database (RTDB) for robot communication, ensuring seamless
-            and immediate data exchange crucial for robot performance.
+            <strong>Predictive Modeling & Machine Learning:</strong> Built and
+            trained machine learning models using Python and TensorFlow for
+            forecasting and trend prediction tasks, enabling businesses to make
+            smarter, data-driven decisions and stay ahead of market changes.
           </>,
           <>
-            Onboard Server Development: I've led the R&D of communication
-            servers within the robots, establishing robust internal networks
-            that facilitate complex operations and strategic decision-making.
+            <strong>Generative AI Development:</strong> Developed generative AI
+            pipelines and intelligent automation workflows using LangChain,
+            designing systems capable of producing AI-generated content,
+            insights, and responses tailored to specific business contexts and
+            user needs.
           </>,
           <>
-            Advanced Robot Control Systems: A significant part of my expertise
-            lies in the R&D of sophisticated robot control systems, enabling
-            precise movements and adaptive behaviors in dynamic environments.
+            <strong>Data Analysis & Insight Generation:</strong> Performed
+            exploratory data analysis (EDA) and statistical modeling to uncover
+            patterns, correlations, and actionable insights from complex
+            datasets, transforming raw data into strategic intelligence for
+            organizational decision-making.
           </>,
           <>
-            Vision Systems: I specialize in the R&D of vision-based object
-            detection for robots, equipping them with the ability to accurately
-            perceive and interact with their surroundings.
+            <strong>Personalization & Recommendation Systems:</strong> Designed
+            and implemented data-driven personalization models to enhance user
+            experiences, leveraging behavioral data and machine learning
+            algorithms to deliver relevant, context-aware recommendations at
+            scale.
           </>,
           <>
-            Recognized National Achievements: My efforts culminated in securing
-            the fourth place in the 2024 Region Indonesian Robot Contest and
-            also the fourth place in the 2024 National Indonesian Robot Contest,
-            demonstrating a proven track record of competitive success and
-            technical excellence.
+            <strong>Process Optimization with AI:</strong> Applied AI and data
+            science methodologies to identify inefficiencies and automate
+            repetitive business processes, helping organizations optimize
+            operations, reduce costs, and unlock new possibilities through
+            intelligent, data-powered automation.
           </>,
         ],
         images: [
@@ -196,49 +231,6 @@ const about = {
           {
             src: "/images/work/dewo-robotic2.jpg",
             alt: "All Team",
-            width: 16,
-            height: 9,
-          },
-        ],
-      },
-      {
-        company: "Google Cloud Developer Surabaya",
-        timeframe: "",
-        role: "Photografer & Videografer ",
-        achievements: [
-          <>
-            I'm responsible for accurately recording and organizing all project
-            processes, progress, and outcomes. I ensure all crucial information
-            is well-documented for future reference, knowledge sharing, and
-            reporting, especially in the context of events and organizational
-            activities.
-          </>,
-          <>
-            As a Photographer, I capture pivotal moments and the atmosphere of
-            technology seminars and events hosted by the Google Cloud Developer
-            Group Surabaya. My goal is to visually represent the learning,
-            interactions, and innovations taking place at each event with
-            high-quality photographs.
-          </>,
-          <>
-            As a Videographer & Editor, I record and produce dynamic video
-            content from the Google Cloud Developer Group Surabaya technology
-            seminars and events. I also edit this material into cohesive,
-            professional videos, highlighting speakers, participants, and key
-            technological insights, for publication across various platforms.
-          </>,
-        ],
-        images: [
-          // optional: leave the array empty if you don't want to display images
-          {
-            src: "/images/work/google-cloud1.jpg",
-            alt: "All Team",
-            width: 16,
-            height: 9,
-          },
-          {
-            src: "/images/work/google-cloud1.1.JPG",
-            alt: "Doc Team",
             width: 16,
             height: 9,
           },
@@ -262,7 +254,7 @@ const about = {
     skills: [
       {
         title: "Languages",
-        description: <>JavaScript | TypeScript | Golang | Python | C++</>,
+        description: <>JavaScript | TypeScript | Python | C++</>,
         images: [],
       },
       {
@@ -272,22 +264,22 @@ const about = {
       },
       {
         title: "Backend Frameworks",
-        description: <>Node.js | Express.js | NestJS | Hapi | Gin Gonic | Go Fiber</>,
+        description: <>Node.js | Express.js | NestJS</>,
         images: [],
       },
       {
         title: "Database & ORM",
-        description: <>PostgreSQL | MongoDB | Redis | Prisma | GORM | SQL | NoSQL</>,
+        description: <>PostgreSQL | Redis | SQL | NoSQL</>,
         images: [],
       },
       {
         title: "Architecture & DevOps",
-        description: <>Docker | Kong API Gateway | Apache Kafka | Git | Jira | Taskfile</>,
+        description: <>Docker | Git</>,
         images: [],
       },
       {
         title: "Machine Learning & Services",
-        description: <>TensorFlow | OpenCV | Xendit | Cloudinary </>,
+        description: <>TensorFlow | OpenCV | Scikit-learn | FastAPI | Streamlit </>,
         images: [],
       },
     ],
@@ -297,8 +289,8 @@ const about = {
     title: "Other skills",
     skills: [
       {
-        title: "Media & Content",
-        description: <>Photography | Videography | Editor</>,
+        title: "UI/UX Design",
+        description: <>Figma | Wireframing | Prototyping</>,
         // optional: leave the array empty if you don't want to display images
         images: [
           // {
