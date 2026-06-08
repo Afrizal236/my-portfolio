@@ -1,53 +1,85 @@
 ---
-title: "Building Noise Filter, adaptive-Median-Filter-wiener-Filter-anisotropic-Diffusion"
-publishedAt: "2025-05-28"
-summary: "Create adaptive filters (adaptive Median Filter, Wiener Filter, and Anisotropic Diffusion) which will be implemented on three noises (Gaussian Noise, Salt-and-Pepper Noise, and Speckle Noise)."
-image: "/images/projects/noise-filter/noise-filter.png"
-tag: "C++ & OpenCV"
+title: "Color Image Denoising with Salt-and-Pepper Noise and Median Filter in Python"
+publishedAt: "2025-06-25"
+summary: "A hands-on image processing project that simulates Salt-and-Pepper noise on color images and applies a Median Filter to restore them, with PSNR-based evaluation to measure filtering quality — built with Python, OpenCV, and NumPy in Google Colab."
+image: "/images/projects/noise-filter/filter2.png"
+tag: "Machine Learning"
 images:
-  - "/images/projects/noise-filter/original.png"
-  - "/images/projects/noise-filter/gaussian.png"
-  - "/images/projects/noise-filter/diffusion_gaussian.png"
-  - "/images/projects/noise-filter/median_gaussian.png"
-  - "/images/projects/noise-filter/wiener_gaussian.png"
-  - "/images/projects/noise-filter/saltpepper.png"
-  - "/images/projects/noise-filter/diffusion_saltpepper.png"
-  - "/images/projects/noise-filter/median_saltpepper.png"
-  - "/images/projects/noise-filter/wiener_saltpepper.png"
-  - "/images/projects/noise-filter/speckle.png"
-  - "/images/projects/noise-filter/diffusion_speckle.png"
-  - "/images/projects/noise-filter/median_speckle.png"
-  - "/images/projects/noise-filter/wiener_speckle.png"
-
+  - "/images/projects/noise-filter/filter1.png"
 ---
 
 ## Overview
 
-Create adaptive filters (adaptive Median Filter, Wiener Filter, and Anisotropic Diffusion) which will be implemented on three noises (Gaussian Noise, Salt-and-Pepper Noise, and Speckle Noise).
+This project is a color image quality enhancement application built with
+Python and OpenCV, developed and run in Google Colab. It implements a
+Salt-and-Pepper noise simulation on color images and applies a Median
+Filter to reduce the noise, followed by a quantitative evaluation using
+Peak Signal-to-Noise Ratio (PSNR) to measure the effectiveness of the
+filtering process. The entire pipeline — from image upload, noise addition,
+filtering, result visualization, to exporting the output — is encapsulated
+in a single interactive Jupyter Notebook.
 
 ## Key Features
 
-- **mage Noise Simulation**: Implemented three different types of noise—Gaussian, Salt-and-Pepper, and Speckle—on grayscale images to simulate real-world image degradation, allowing robust testing of denoising algorithms.
-- **Noise Filtering System**: Applied three denoising techniques—Adaptive Median Filter, Wiener Filter, and Anisotropic Diffusion—for each noise type, enabling a comparative analysis of filtering performance on different noise characteristics.
-- **Modular Utilities Integration**: Utilized custom utility modules (noise.hpp, filters.hpp) to separate concerns, making the codebase cleaner and more maintainable. This modularity also supports easy experimentation with different filtering strategies.
-- **Result Visualization and Export**: Leveraged OpenCV's imshow() and imwrite() functions to both preview and export the results of each filtering step, ensuring easy verification and further processing of the output images.
-- **Performance and Scalability**: Designed to work with image resizing for better performance during testing and to maintain consistency in comparison across noise and filter combinations.
-- **Grayscale Conversion Pipeline**: Ensured consistency in noise application by converting images to grayscale before processing, creating a standardized baseline for noise and filtering operations.
+- **Salt-and-Pepper Noise Simulation**: Adds configurable Salt-and-Pepper
+  noise to color images by randomly setting pixels to 255 (salt) or 0
+  (pepper) across all RGB channels, simulating real-world image
+  degradation scenarios.
+- **Median Filter Denoising**: Applies OpenCV's `medianBlur()` with a
+  configurable kernel size to remove Salt-and-Pepper noise while
+  preserving edge details, with higher kernel sizes producing stronger
+  but blurrier smoothing.
+- **PSNR Quality Evaluation**: Calculates Peak Signal-to-Noise Ratio
+  (PSNR) in decibels for both the noisy and filtered images against the
+  original, providing a quantitative metric to evaluate filtering
+  effectiveness — a PSNR above 30 dB indicates high similarity to the
+  original.
+- **Interactive Image Upload**: Uses Google Colab's `files.upload()` to
+  allow users to upload any image directly in the notebook environment
+  without needing a local setup.
+- **Result Visualization**: Displays the original, noisy, and filtered
+  images side-by-side using Matplotlib subplots, with PSNR values shown
+  in the figure title for immediate comparison.
+- **Output Export**: Saves both the noisy and filtered images as separate
+  files using OpenCV's `imwrite()` with proper BGR-to-RGB conversion,
+  ensuring correct color output.
 
 ## Technologies Used
 
-- **C++**: Core programming language used to implement the image processing pipeline with high performance and fine-grained control over memory and computation.
-- **OpenCV**: Open-source computer vision library used for image manipulation, grayscale conversion, resizing, noise addition, filtering, visualization, and exporting images.
-- **Custom Utility Modules (noise.hpp, filters.hpp)**: Encapsulated logic for various noise generation methods and filtering techniques, promoting code modularity and reusability.
+- **Python**: Core programming language for all image processing logic,
+  numerical computation, and pipeline orchestration.
+- **OpenCV (cv2)**: Used for image reading, BGR-to-RGB conversion, median
+  filtering via `medianBlur()`, and exporting output images via
+  `imwrite()`.
+- **NumPy**: Handles array operations for noise generation, pixel
+  manipulation, and MSE calculation in the PSNR formula.
+- **Matplotlib**: Used to render the three-panel comparison visualization
+  (original, noisy, filtered) with PSNR values as the plot title.
+- **Google Colab**: Cloud-based notebook environment providing the
+  interactive file upload widget and GPU-accessible runtime for
+  development and testing.
 
 ## Challenges and Learnings
 
-During the development of this program, the main challenges faced were understanding the characteristics of the different types of noise—Gaussian, Salt-and-Pepper, and Speckle—and selecting the appropriate filtering method for each type. This process provides a deep understanding of the behavior of filters such as Adaptive Median, Wiener, and Anisotropic Diffusion. In addition, designing a modular code structure using header files such as noise.hpp and filters.hpp is an important lesson in applying clean and structured programming principles. Using OpenCV also enriches understanding in image manipulation, from conversion to grayscale, adding noise, to visualization and saving results. Another challenge emerged in the form of image artifacts due to incorrect settings of filter parameters and data types, which prompted further exploration of matrix operations in OpenCV. This entire process reinforces the understanding of the importance of preprocessing, modularity, and controlled experimentation in digital image processing.
+The main challenge in this project was correctly handling color images
+throughout the noise and filtering pipeline — OpenCV reads images in BGR
+format while Matplotlib displays in RGB, requiring explicit color space
+conversion at every display and export step to avoid incorrect color
+output. Implementing Salt-and-Pepper noise for color images also required
+careful handling of all three channels simultaneously, ensuring that noisy
+pixels appear as pure white or black rather than colored artifacts.
+Calculating PSNR provided a concrete lesson in quantitative image quality
+assessment — learning that a PSNR above 30 dB indicates strong similarity
+to the original, and that a higher filtered PSNR compared to the noisy
+PSNR confirms the median filter's effectiveness. Overall, this project
+reinforced the importance of understanding data types, color spaces, and
+measurable evaluation metrics in digital image processing pipelines.
 
 ## Project Repository
 
-Clone the git repository:
-```bash
-git clone https://github.com/muhammadwildanskyyy/adaptive-Median-Filter_wiener-Filter_anisotropic-Diffusion.git
-```
+The full source code is available on GitHub. Feel free to view, download,
+or develop it further.
 
+```bash
+git clone https://github.com/Afrizal236/penghilang-noise-foto.git
+```

@@ -1,0 +1,105 @@
+---
+title: "Building a Cinematic Parallax Scroll Effect with Pure HTML, CSS, and JavaScript"
+publishedAt: "2025-05-28"
+summary: "A deep dive into how RamyJungle's hero section was built using five layered PNG assets and vanilla JavaScript to create a cinematic jungle parallax effect — no libraries, no frameworks."
+image: "/images/projects/Jungle/jungle1.png"
+tag: "Web Development"
+images:
+  - "/images/projects/Jungle/jungle1.png"
+---
+
+# Building a Cinematic Parallax Scroll Effect with Pure HTML, CSS, and JavaScript
+
+You know that satisfying feeling when you scroll a website and the background layers move at different speeds, creating an illusion of depth? That's parallax scrolling — and it's one of the most visually striking effects you can build with nothing but vanilla HTML, CSS, and JavaScript.
+
+In the **RamyJungle** project, I used this technique to build the landing page hero section. Five layered PNG assets — hills, cliffs, and tropical trees — move at different speeds as you scroll, creating a cinematic jungle atmosphere that pulls you into the world of Indonesian wildlife conservation.
+
+Let's break down exactly how it works.
+
+## What is Parallax Scrolling?
+
+Parallax scrolling is a visual technique where background layers move at a slower speed than foreground layers during scrolling. The difference in speed creates a sense of depth and three-dimensionality — like looking through a window at a landscape.
+
+The key principle:
+
+- **Far layers** (background) → move slow
+- **Near layers** (foreground) → move fast
+
+## The Layer Setup
+
+In RamyJungle, the hero section uses five PNG assets stacked on top of each other:
+
+```
+hill1.png → mountains in the distance  (slowest)
+hill2.png → cliffs with a lone tree
+hill3.png → tropical jungle mid-ground
+hill4.png → rocky cliffs with vegetation
+hill5.png → palm trees and foreground brush (fastest)
+```
+
+Each layer is positioned absolutely, covering the full viewport width, and stacked using `z-index`.
+
+## JavaScript — The Parallax Magic
+
+This is where the effect comes to life. On every scroll event, we shift each layer's vertical position by a different amount based on the scroll value:
+
+```javascript
+window.addEventListener("scroll", () => {
+  const scrollY = window.scrollY;
+
+  document.getElementById("hill1").style.top = scrollY * 0.1 + "px";
+  document.getElementById("hill2").style.top = scrollY * 0.2 + "px";
+  document.getElementById("hill3").style.top = scrollY * 0.3 + "px";
+  document.getElementById("hill4").style.top = scrollY * 0.4 + "px";
+  document.getElementById("hill5").style.top = scrollY * 0.5 + "px";
+});
+```
+
+The multiplier is the key:
+
+- `hill1 * 0.1` → barely moves (far away)
+- `hill5 * 0.5` → moves the most (closest to viewer)
+
+## Performance Tip: Use `transform` Instead of `top`
+
+Moving elements with `top` triggers layout recalculation on every frame, which can cause jank on lower-end devices. A better approach is using `transform: translateY()` which only triggers the composite layer — much smoother:
+
+```javascript
+window.addEventListener("scroll", () => {
+  const scrollY = window.scrollY;
+
+  document.getElementById("hill1").style.transform =
+    `translateY(${scrollY * 0.1}px)`;
+  document.getElementById("hill2").style.transform =
+    `translateY(${scrollY * 0.2}px)`;
+  document.getElementById("hill3").style.transform =
+    `translateY(${scrollY * 0.3}px)`;
+  document.getElementById("hill4").style.transform =
+    `translateY(${scrollY * 0.4}px)`;
+  document.getElementById("hill5").style.transform =
+    `translateY(${scrollY * 0.5}px)`;
+});
+```
+
+This creates the feeling that you're "entering" the jungle as you scroll.
+
+## The Result
+
+With just ~20 lines of JavaScript and a handful of PNG assets, you get a
+hero section that feels alive — layers of jungle depth unfolding as the
+user scrolls, with smooth cinematic motion that immediately sets the mood
+of the entire website.
+
+No libraries. No frameworks. Just HTML, CSS, and vanilla JavaScript.
+
+The full implementation is available in the RamyJungle repository if you
+want to see how it fits into the complete project structure.
+
+## Project Repository
+
+The full source code is available on GitHub. Feel free to view, download,
+or develop it further.
+
+```bash
+git clone https://github.com/Afrizal236/Unity-Endless-Game-Runner.git
+```

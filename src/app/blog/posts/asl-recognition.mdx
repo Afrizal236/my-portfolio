@@ -1,0 +1,169 @@
+---
+title: "Real-Time ASL Hand Gesture Recognition Using MediaPipe and Geometric Landmark Analysis"
+publishedAt: "2025-08-22"
+summary: "A real-time American Sign Language (ASL) recognition system that detects A-Z hand gestures from a webcam using MediaPipe's 21-point hand landmarks and a purely geometric rule-based approach — no neural network, no training data required."
+tag: "Machine Learning"
+images:
+  - "/images/projects/asl-recognition/recognition1.png"
+---
+
+## Overview
+
+Computer vision has undergone a revolution in the past decade, driven 
+almost entirely by real-time landmark detection. While traditional 
+approaches required training massive datasets to recognize hand shapes, 
+modern solutions like MediaPipe can track 21 precise hand landmarks at 
+60+ FPS — no GPU required.
+
+The **ASL Hand Gesture Recognition** project leverages this capability 
+to classify American Sign Language (ASL) hand gestures from A to Z in 
+real-time using a webcam. Instead of a neural network classifier, this 
+project uses a purely geometric rule-based approach — analyzing the 
+spatial relationships between hand landmarks to determine which letter 
+is being signed.
+
+## Why Rule-Based Instead of a Neural Network?
+
+A typical approach to gesture recognition would be to train a 
+classification model on thousands of labeled hand images. But this 
+project takes a different — and arguably more elegant — path: 
+**geometric reasoning directly on landmark coordinates**.
+
+MediaPipe provides 21 landmark points per hand, each with x, y, z 
+coordinates. By analyzing the relative positions of fingertips, PIP 
+joints, and MCP joints, we can determine:
+
+- Which fingers are extended or folded
+- Whether the thumb is pointing sideways, crossing over, or tucked under
+- The exact spatial relationship between the thumb and each finger
+
+This approach requires zero training data, runs instantly, and is fully 
+explainable — you can read exactly why the model thinks a gesture is "A" 
+versus "S".
+
+## The Core Detection Logic
+
+Every letter check is a pure geometric function over the 21 landmarks:
+
+```python
+def finger_up(landmarks, finger):
+    """Jari terangkat — ujung lebih tinggi dari PIP joint."""
+    tip = get_lm(landmarks, FINGER_TIPS[finger])
+    pip = get_lm(landmarks, FINGER_PIPS[finger])
+    return tip[1] < pip[1] - 0.02  # y lebih kecil = lebih tinggi di layar
+
+def finger_curled_tight(landmarks, finger):
+    """Jari menekuk penuh — ujung mendekati telapak."""
+    tip = get_lm(landmarks, FINGER_TIPS[finger])
+    mcp = get_lm(landmarks, FINGER_MCPS[finger])
+    return tip[1] > mcp[1] - 0.01
+```
+
+## The Hardest Problem: Disambiguating Similar Fist Gestures
+
+The most technically challenging part of the project is correctly 
+distinguishing five letters that all share the same base shape — a 
+**tight fist**: A, S, T, M, and N.
+
+The only difference between them is where the thumb sits relative to 
+the fingers. This required designing five dedicated geometric helpers:
+
+```python
+def thumb_beside_index(landmarks):
+    """A — ibu jari keluar ke samping, sejajar MCP telunjuk."""
+    t4 = get_lm(landmarks, 4)   # ujung ibu jari
+    t5 = get_lm(landmarks, 5)   # MCP telunjuk
+    dx = abs(t4[0] - t5[0])
+    dy = t4[1] - t5[1]
+    vertical_aligned = abs(t4[1] - get_lm(landmarks, 6)[1]) < 0.12
+    return dx > 0.07 and dy > -0.06 and vertical_aligned
+
+def thumb_between_index_middle(landmarks):
+    """T — ibu jari menyembul di sela telunjuk dan jari tengah."""
+    t4  = get_lm(landmarks, 4)
+    t6  = get_lm(landmarks, 6)   # PIP telunjuk
+    t10 = get_lm(landmarks, 10)  # PIP jari tengah
+    below_index_pip = t4[1] > t6[1] - 0.02
+    x_min = min(t6[0], t10[0]) - 0.03
+    x_max = max(t6[0], t10[0]) + 0.03
+    return below_index_pip and x_min < t4[0] < x_max and dist(t4, t6) < 0.14
+
+def thumb_under_three_fingers(landmarks):
+    """M — ibu jari tersembunyi di bawah 3 jari."""
+    t4  = get_lm(landmarks, 4)
+    t6  = get_lm(landmarks, 6)
+    t10 = get_lm(landmarks, 10)
+    t14 = get_lm(landmarks, 14)
+    return (t4[1] > t6[1] and t4[1] > t10[1] and t4[1] > t14[1] - 0.02)
+```
+
+The order of gesture checks in the `GESTURES` list is critical — more 
+specific gestures (M, T, N) must be checked before more general ones 
+(S, A, E) to prevent false positives:
+
+```python
+GESTURES = [
+    # ... other letters ...
+    ('M', 'Ibu jari di bawah 3 jari',              check_M),  # most specific
+    ('T', 'Ibu jari di sela telunjuk+tengah',       check_T),
+    ('N', 'Ibu jari di bawah 2 jari',               check_N),
+    ('S', 'Kepalan + ibu jari di depan',            check_S),
+    ('A', 'Kepalan + ibu jari di samping',          check_A),  # least specific
+    ('E', 'Semua jari tekuk penuh',                 check_E),
+]
+```
+
+## Stabilization System
+
+Raw frame-by-frame detection is noisy — a gesture might flicker between 
+letters during transition. To solve this, a **stability counter** is 
+used: a letter is only confirmed after it has been detected consistently 
+for at least 2 consecutive frames, and confidence grows the longer the 
+gesture is held:
+
+```python
+if detected_letter == last_letter:
+    stable_frames += 1
+else:
+    stable_frames = 0
+    last_letter = detected_letter
+
+confidence = min(100, 30 + stable_frames * 10)
+
+if stable_frames >= 2:
+    current_letter = detected_letter
+```
+
+## Technologies Used
+
+- **Python**: Core language for all gesture logic and application 
+  orchestration.
+- **MediaPipe**: Google's real-time hand tracking solution, providing 
+  21 3D landmarks per hand at high FPS with no GPU required.
+- **OpenCV**: Handles webcam capture, frame flipping, landmark 
+  visualization, and the real-time UI overlay rendering.
+- **NumPy**: Powers all coordinate math — distance calculations, 
+  positional comparisons, and geometric reasoning between landmarks.
+
+## Challenges and Learnings
+
+The biggest challenge was designing geometric rules precise enough to 
+distinguish visually similar gestures — particularly the fist group 
+(A, S, T, M, N) where the only differentiator is a few millimeters of 
+thumb position. This required multiple iterations of threshold tuning 
+and careful ordering of gesture checks to prevent cascading false 
+positives. The stabilization system was also a key lesson: raw detection 
+is inherently noisy, and a small confidence buffer dramatically improves 
+the perceived reliability of the system. Overall, this project proved 
+that rule-based geometric reasoning can be a powerful and transparent 
+alternative to black-box neural network classifiers for well-defined 
+spatial recognition tasks.
+
+## Project Repository
+
+The full source code is available on GitHub. Feel free to view, download,
+or develop it further.
+
+```bash
+git clone https://github.com/Afrizal236/Unity-Endless-Game-Runner.git
+```
