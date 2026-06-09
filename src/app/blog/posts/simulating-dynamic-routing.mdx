@@ -1,0 +1,242 @@
+---
+title: "Simulating Dynamic Routing Networks with Cisco Packet Tracer"
+publishedAt: "2024-06-23"
+summary: "The complete pipeline from topology design to real-time packet forwarding simulation. Covers RIP, OSPF, and EIGRP configuration, cable selection, IP addressing, and connectivity testing across office and internet café network scenarios."
+tag: "Networking"
+images:
+  - "/images/projects/Networking/Networking.png"
+---
+
+# Simulasi Routing Dinamis dengan Cisco Packet Tracer
+
+## Overview
+
+Building a physical network lab with real routers and switches is expensive and time-consuming. Getting that same network to run perfectly in a virtual environment — with zero packet loss and full inter-subnet connectivity — is where the real networking begins.
+
+**Cisco Packet Tracer** bridges this gap — it's a lightweight network simulator designed for students and network engineers. In the **Dynamic & Static Routing** project, we designed two real-world network scenarios (internet café and office network) on Cisco Packet Tracer and configured dynamic routing protocols for real-time packet forwarding between subnets.
+
+This article covers the complete network simulation pipeline: from topology design and IP addressing to routing configuration and connectivity testing.
+
+---
+
+## The Network Simulation Pipeline
+
+```
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│   Topology   │     │   Routing    │     │   Testing    │
+│   Design     │     │   Config     │     │              │
+│              │     │              │     │              │
+│ IP Addressing│────▶│ RIP / OSPF / │────▶│ ping &       │
+│ Subnetting   │     │ EIGRP        │     │ tracert      │
+│              │     │              │     │              │
+│ Topology     │     │ Router &     │     │ 0% Packet    │
+│ Design       │     │ Switch Setup │     │ Loss         │
+└──────────────┘     └──────────────┘     └──────────────┘
+```
+
+---
+
+## Step 1: Topology Design
+
+Before any configuration, the first step is designing the network topology and IP addressing scheme for each scenario.
+
+### Scenario 1 — Office Network
+
+The office network consists of three departments, each isolated in their own subnet and interconnected via routers:
+
+```
+Subnet HR     : 192.168.1.0/24
+Subnet IT     : 192.168.2.0/24
+Subnet Finance: 192.168.3.0/24
+
+Router0 ──────── Switch0 ──────── PC-HR
+   │
+Router1 ──────── Switch1 ──────── PC-IT
+   │
+Router2 ──────── Switch2 ──────── PC-Finance
+```
+
+### Scenario 2 — Internet Café Network
+
+The internet café network connects multiple client PCs to a central router that acts as a gateway to the internet:
+
+```
+Subnet Client : 192.168.10.0/24
+Gateway/ISP   : 192.168.20.0/24
+
+Router ──────── Switch ──────── PC-Client-1
+                        ├───── PC-Client-2
+                        ├───── PC-Client-3
+                        └───── PC-Client-N
+```
+
+---
+
+## Step 2: Routing Protocol Configuration
+
+### RIP v2 (Routing Information Protocol)
+
+RIP is the simplest dynamic routing protocol, suitable for small networks with a maximum of 15 hops:
+
+```bash
+# Configure RIP on Router0
+Router> enable
+Router# configure terminal
+Router(config)# router rip
+Router(config-router)# version 2
+Router(config-router)# network 192.168.1.0
+Router(config-router)# network 192.168.2.0
+Router(config-router)# no auto-summary
+Router(config-router)# end
+```
+
+### OSPF (Open Shortest Path First)
+
+OSPF uses the Dijkstra algorithm to find the shortest path, making it more efficient for larger networks:
+
+```bash
+# Configure OSPF on Router0
+Router> enable
+Router# configure terminal
+Router(config)# router ospf 1
+Router(config-router)# network 192.168.1.0 0.0.0.255 area 0
+Router(config-router)# network 192.168.2.0 0.0.0.255 area 0
+Router(config-router)# end
+```
+
+### EIGRP (Enhanced Interior Gateway Routing Protocol)
+
+EIGRP is a Cisco proprietary protocol that offers the fastest convergence using the DUAL algorithm:
+
+```bash
+# Configure EIGRP on Router0
+Router> enable
+Router# configure terminal
+Router(config)# router eigrp 100
+Router(config-router)# network 192.168.1.0
+Router(config-router)# network 192.168.2.0
+Router(config-router)# no auto-summary
+Router(config-router)# end
+```
+
+### Routing Protocol Comparison
+
+| Protocol | Algorithm | Max Hop | Convergence | Best For |
+|----------|-----------|---------|-------------|----------|
+| RIP v2 | Bellman-Ford | 15 | Slow | Small networks |
+| OSPF | Dijkstra | Unlimited | Fast | Large networks |
+| EIGRP | DUAL | Unlimited | Very fast | Cisco networks |
+
+---
+
+## Step 3: Cable Type Selection
+
+Choosing the correct cable type is critical for ensuring proper connectivity between devices.
+
+### Straight-Through Cable
+
+Used for connecting **different** types of devices:
+
+```
+PC       ──[Straight-Through]──▶ Switch
+Switch   ──[Straight-Through]──▶ Router
+```
+
+### Crossover Cable
+
+Used for connecting **similar** types of devices:
+
+```
+Router   ──[Crossover]──▶ Router
+PC       ──[Crossover]──▶ PC
+Switch   ──[Crossover]──▶ Switch
+```
+
+### Cable Type Comparison
+
+| Cable Type | Used For | Example |
+|------------|----------|---------|
+| Straight-through | Different devices | PC ↔ Switch, Switch ↔ Router |
+| Crossover | Same device type | Router ↔ Router, PC ↔ PC |
+
+---
+
+## Step 4: Connectivity Testing
+
+### Ping Between Subnets
+
+```bash
+# From PC-HR to PC-Finance (Office Network)
+PC> ping 192.168.3.10
+
+Pinging 192.168.3.10 with 32 bytes of data:
+Reply from 192.168.3.10: bytes=32 time=1ms TTL=126
+Reply from 192.168.3.10: bytes=32 time=1ms TTL=126
+Reply from 192.168.3.10: bytes=32 time=1ms TTL=126
+Reply from 192.168.3.10: bytes=32 time=1ms TTL=126
+
+Ping statistics for 192.168.3.10:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss)
+```
+
+### Tracert to Observe Routing Path
+
+```bash
+# Tracert from Warnet Client PC to Gateway
+PC> tracert 192.168.20.1
+
+Tracing route to 192.168.20.1 over a maximum of 30 hops:
+  1    1ms    192.168.10.1   (Local Gateway)
+  2    2ms    192.168.20.1   (ISP/Internet)
+
+Trace complete.
+```
+
+---
+
+## Optimization Tips for Network Simulation
+
+### 1. Use OSPF for Scalable Networks
+
+Unlike RIP, OSPF has no hop count limit and converges faster. For large office networks with multiple departments, OSPF with multiple areas is the recommended approach:
+
+```bash
+# OSPF with multiple areas for large networks
+Router(config)# router ospf 1
+Router(config-router)# network 10.0.0.0 0.0.0.255 area 0       # Backbone
+Router(config-router)# network 192.168.1.0 0.0.0.255 area 1    # HR Area
+Router(config-router)# network 192.168.2.0 0.0.0.255 area 2    # IT Area
+```
+
+### 2. Add DHCP Server
+
+Instead of manually assigning IPs to every client PC, configure a DHCP server on the router to automate IP distribution:
+
+```bash
+Router(config)# ip dhcp pool WARNET
+Router(dhcp-config)# network 192.168.10.0 255.255.255.0
+Router(dhcp-config)# default-router 192.168.10.1
+Router(dhcp-config)# dns-server 8.8.8.8
+Router(dhcp-config)# end
+```
+
+### 3. Implement VLAN for Traffic Segmentation
+
+Separate inter-department traffic in the office network using VLANs to improve security and reduce broadcast traffic:
+
+```bash
+Switch(config)# vlan 10
+Switch(config-vlan)# name HR
+Switch(config)# vlan 20
+Switch(config-vlan)# name IT
+Switch(config)# vlan 30
+Switch(config-vlan)# name Finance
+```
+
+---
+
+## Conclusion
+
+The journey from a blank topology to a fully connected multi-subnet network requires careful planning at every stage. Cisco Packet Tracer's simulation environment makes it possible to practice enterprise-grade networking on any laptop without physical hardware.
+
+The key lesson from this project: **protocol selection is everything**. A wrong routing protocol choice that works on a 3-router lab will completely break on a 30-router production network. RIP is a great starting point, but OSPF and EIGRP are what real networks run on.

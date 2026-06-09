@@ -1,0 +1,338 @@
+---
+title: "Understanding Database Fundamentals: From Tables to Transactions"
+publishedAt: "2024-08-16"
+summary: "A complete guide to database core concepts — from tables, relationships, and normalization to SQL queries, indexing, and ACID transactions. Everything you need to understand how modern databases store, organize, and retrieve data efficiently."
+tag: "Database"
+images:
+  - "/images/projects/database-fundamentals/fundamental1.png"
+---
+
+## Overview
+
+Storing data in a plain text file works fine for 100 records. Making that same system handle millions of records with fast queries, zero data loss, and multiple users writing simultaneously — that's where databases begin.
+
+**Relational Databases** bridge this gap — they're structured storage systems designed to organize data into tables, enforce relationships, and guarantee data integrity. In **Database Fundamentals**, we explore the core concepts that power every modern application: from a simple blog to a large-scale e-commerce platform.
+
+This article covers the essential database concepts: from data modeling and normalization to SQL queries and transaction management.
+
+---
+
+## The Database Concept Pipeline
+
+```
++----------------+     +----------------+     +----------------+
+|    Data        |     |    Query       |     | Transaction    |
+|   Modeling     |     |  & Retrieval   |     |  & Integrity   |
+|                |     |                |     |                |
+| Tables &       |---->| SQL SELECT /   |---->| ACID           |
+| Relations      |     | JOIN / GROUP   |     | Properties     |
+|                |     |                |     |                |
+| Normalization  |     | Index &        |     | Concurrency    |
+| ERD            |     | Optimization   |     | Control        |
++----------------+     +----------------+     +----------------+
+```
+
+---
+
+## Step One: Tables and Relationships
+
+A database organizes data into **tables** (also called relations), where each table represents a single entity. Each row is a record, and each column is an attribute.
+
+### Basic Table Structure
+
+```sql
+-- A simple table representing a Student entity
+CREATE TABLE students (
+    id          INT PRIMARY KEY AUTO_INCREMENT,
+    name        VARCHAR(100) NOT NULL,
+    email       VARCHAR(100) UNIQUE NOT NULL,
+    birthdate   DATE,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+### Types of Relationships
+
+```
+One-to-One
+  One student has one student card
+  students -------- student_cards
+
+One-to-Many
+  One teacher teaches many students
+  teachers -------- students
+              |---- student_1
+              |---- student_2
+              |---- student_N
+
+Many-to-Many
+  Many students enroll in many courses
+  students ---- enrollments ---- courses
+```
+
+### Implementing Relationships with Foreign Keys
+
+```sql
+-- One-to-Many: courses belong to a department
+CREATE TABLE departments (
+    id    INT PRIMARY KEY AUTO_INCREMENT,
+    name  VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE courses (
+    id            INT PRIMARY KEY AUTO_INCREMENT,
+    name          VARCHAR(100) NOT NULL,
+    department_id INT,
+    FOREIGN KEY (department_id) REFERENCES departments(id)
+);
+
+-- Many-to-Many: students enroll in courses
+CREATE TABLE enrollments (
+    student_id  INT,
+    course_id   INT,
+    enrolled_at DATE,
+    PRIMARY KEY (student_id, course_id),
+    FOREIGN KEY (student_id) REFERENCES students(id),
+    FOREIGN KEY (course_id)  REFERENCES courses(id)
+);
+```
+
+---
+
+## Step Two: Normalization
+
+Normalization is the process of organizing a database to reduce **data redundancy** and improve **data integrity**. It is divided into Normal Forms (NF).
+
+### Before Normalization (Unnormalized)
+
+```
+order_id | customer | email          | products
+---------|----------|----------------|------------------
+1        | Afrizal  | a@mail.com     | Laptop, Mouse
+2        | Afrizal  | a@mail.com     | Keyboard
+3        | Budi     | b@mail.com     | Monitor, Mouse
+
+Problems: duplicate customer data, multiple values in one column
+```
+
+### After Normalization (Third Normal Form)
+
+```sql
+-- First Normal Form: Eliminate repeating groups, one value per cell
+-- Second Normal Form: Remove partial dependencies, split into tables
+-- Third Normal Form: Remove transitive dependencies
+
+CREATE TABLE customers (
+    id    INT PRIMARY KEY,
+    name  VARCHAR(100),
+    email VARCHAR(100) UNIQUE
+);
+
+CREATE TABLE orders (
+    id          INT PRIMARY KEY,
+    customer_id INT,
+    order_date  DATE,
+    FOREIGN KEY (customer_id) REFERENCES customers(id)
+);
+
+CREATE TABLE order_items (
+    order_id   INT,
+    product_id INT,
+    quantity   INT,
+    PRIMARY KEY (order_id, product_id)
+);
+```
+
+### Normal Form Comparison
+
+| Normal Form | Rule | Problem Solved |
+|-------------|------|----------------|
+| First NF | Each column has atomic values | Repeating groups |
+| Second NF | No partial dependency on PK | Redundant data in composite keys |
+| Third NF | No transitive dependency | Indirect column dependencies |
+| BCNF | Every determinant is a candidate key | Anomalies in third NF edge cases |
+
+---
+
+## Step Three: SQL Queries
+
+SQL (Structured Query Language) is the standard language for interacting with relational databases.
+
+### Basic CRUD Operations
+
+```sql
+-- CREATE
+INSERT INTO students (name, email, birthdate)
+VALUES ('Afrizal', 'afrizal@mail.com', '2003-05-12');
+
+-- READ
+SELECT * FROM students WHERE name = 'Afrizal';
+
+-- UPDATE
+UPDATE students SET email = 'new@mail.com' WHERE id = 1;
+
+-- DELETE
+DELETE FROM students WHERE id = 1;
+```
+
+### JOIN — Combining Tables
+
+```sql
+-- INNER JOIN: only matching rows from both tables
+SELECT students.name, courses.name AS course
+FROM enrollments
+INNER JOIN students ON enrollments.student_id = students.id
+INNER JOIN courses  ON enrollments.course_id  = courses.id;
+
+-- LEFT JOIN: all rows from left table, matched rows from right
+SELECT students.name, enrollments.course_id
+FROM students
+LEFT JOIN enrollments ON students.id = enrollments.student_id;
+```
+
+### Aggregation
+
+```sql
+-- Count students per department
+SELECT departments.name, COUNT(students.id) AS total_students
+FROM students
+INNER JOIN departments ON students.department_id = departments.id
+GROUP BY departments.name
+HAVING COUNT(students.id) > 10
+ORDER BY total_students DESC;
+```
+
+---
+
+## Step Four: Indexing and Query Optimization
+
+Without indexes, every query scans the entire table — fine for 100 rows, catastrophic for 10 million rows.
+
+### Creating Indexes
+
+```sql
+-- Single column index
+CREATE INDEX idx_students_email ON students(email);
+
+-- Composite index for queries filtering by multiple columns
+CREATE INDEX idx_enrollments_student_course
+ON enrollments(student_id, course_id);
+```
+
+### Query Performance Comparison
+
+| Condition | Rows Scanned | Query Time |
+|-----------|-------------|------------|
+| No index (full table scan) | 1,000,000 | ~800ms |
+| With single index | ~100 | ~2ms |
+| With composite index | ~1 | less than 1ms |
+
+### Using EXPLAIN to Analyze Queries
+
+```sql
+-- Check how MySQL executes a query
+EXPLAIN SELECT * FROM students WHERE email = 'afrizal@mail.com';
+
+-- Output:
+-- type: ref  means index is used  (GOOD)
+-- type: ALL  means full table scan (BAD)
+-- rows: 1    means only one row scanned (GOOD)
+```
+
+---
+
+## Step Five: ACID Transactions
+
+A **transaction** is a sequence of operations treated as a single unit. ACID properties guarantee reliability even when things go wrong.
+
+```
+A — Atomicity    : All operations succeed, or none of them do
+C — Consistency  : Data always moves from one valid state to another
+I — Isolation    : Concurrent transactions do not interfere with each other
+D — Durability   : Committed data survives system crashes
+```
+
+### Transaction Example
+
+```sql
+-- Transfer balance between two accounts
+-- Without transaction: a crash halfway leaves inconsistent data
+-- With transaction: either both operations complete, or neither does
+
+START TRANSACTION;
+
+UPDATE accounts SET balance = balance - 500000 WHERE id = 1;
+UPDATE accounts SET balance = balance + 500000 WHERE id = 2;
+
+-- If both succeed
+COMMIT;
+
+-- If anything fails
+ROLLBACK;
+```
+
+---
+
+## Optimization Tips for Database Design
+
+### Choose the Right Data Types
+
+Using the wrong data type wastes storage and slows queries:
+
+```sql
+-- Bad: storing numbers as strings
+CREATE TABLE products (
+    price VARCHAR(20)
+    -- BAD: cannot do math operations, wastes space
+);
+
+-- Good: use appropriate numeric types
+CREATE TABLE products (
+    price  DECIMAL(10, 2),
+    -- GOOD: exact decimal for money
+    stock  INT UNSIGNED,
+    -- GOOD: no negative stock values
+    rating TINYINT
+    -- GOOD: small range (1-5), saves space
+);
+```
+
+### Avoid the N+1 Query Problem
+
+```sql
+-- Bad: 1 query to get all students + N queries for each enrollment
+SELECT * FROM students;
+-- then for each student:
+SELECT * FROM enrollments WHERE student_id = ?;
+-- this runs N times, once per student
+
+-- Good: 1 query using JOIN
+SELECT students.name, COUNT(enrollments.course_id) AS total_courses
+FROM students
+LEFT JOIN enrollments ON students.id = enrollments.student_id
+GROUP BY students.id;
+```
+
+### Use Connection Pooling
+
+Opening a new database connection for every request is expensive. Connection pooling reuses existing connections:
+
+```python
+# Using SQLAlchemy connection pool in Python
+from sqlalchemy import create_engine
+
+engine = create_engine(
+    "mysql+pymysql://user:pass@localhost/dbname",
+    pool_size=10,       # maintain 10 persistent connections
+    max_overflow=20,    # allow up to 20 extra connections
+    pool_timeout=30     # wait max 30s for an available connection
+)
+```
+
+---
+
+## Conclusion
+
+The journey from a flat text file to a well-structured relational database requires careful thinking at every stage. Normalization, proper indexing, and ACID transactions are what separate a database that works in development from one that holds up in production.
+
+The key lesson from database fundamentals: **structure is everything**. A poorly designed schema that works for 1,000 users will completely fall apart at 1,000,000. Design for relationships first, optimize for performance second, and never skip transactions when data integrity matters.

@@ -1,0 +1,420 @@
+---
+title: "Building a City Government Website with Next.js and Backend-for-Frontend Architecture"
+publishedAt: "2025-12-06"
+summary: "A complete breakdown of building the official Surabaya city government website using Next.js, TypeScript, and a Backend-for-Frontend proxy pattern. Covers BFF architecture, React Query data fetching, Docker deployment, and accessibility features for a public-facing civic platform."
+tag: "Frontend"
+images:
+  - "/images/work/wisata/wisata2.png"
+  - "/images/work/wisata/wisata1.png"
+
+team:
+  - name: "Afrizal Ramy Diaman"
+    role: "Frontend Developer"
+    avatar: "/images/avatar.png"
+    linkedIn: " "
+techStack:
+  - "Next.js"
+  - "TypeScript"
+  - "Material UI"
+  - "React Query"
+  - "Axios"
+  - "Docker"
+  - "Node.js"
+category: "Frontend"
+---
+
+**GitHub Repository:**
+```bash
+git clone https://github.com/Afrizal236/page-wisata-surabaya.go.id.git
+```
+
+## Overview
+
+Building a personal portfolio website is straightforward. Building an official city government platform that serves millions of citizens — with real-time news, tourism information, event calendars, media galleries, and accessibility features, all proxied securely through a server-side layer — that is where frontend engineering meets public infrastructure.
+
+**surabaya.go.id** bridges this gap — the official frontend for the City of Surabaya built with **Next.js 13**, using a **Backend-for-Frontend (BFF)** pattern to proxy internal APIs securely before delivering data to the browser. Every page, from breaking news to tourist destinations, flows through a controlled server-side layer that handles authentication signatures and data normalization.
+
+This article covers the complete architecture: from BFF proxy design and React Query data fetching to Docker deployment and component organization.
+
+---
+
+## The Architecture Pipeline
+
+```
++----------------+     +----------------+     +----------------+
+|    Browser     |     |   Next.js BFF  |     |   Backend APIs |
+|                |     |                |     |                |
+| Pages &        |---->| API Routes     |---->| Surabaya API   |
+| Components     |     | /api/data/     |     | BASE_API_URL   |
+|                |     |                |     |                |
+| React Query    |     | Axios + Sign   |     | WebDisplay API |
+| TanStack       |     | Header Proxy   |     | API_URL_WD     |
++----------------+     +----------------+     +----------------+
+```
+
+---
+
+## Step One: Project Setup
+
+### Environment Configuration
+
+```env
+# Primary backend API
+API_URL=http://surabaya.go.id/api/
+
+# WebDisplay API
+API_URL_WEBDISPLAY=https://webdisplay.surabaya.go.id/api/
+
+# Public image base URL (available in browser)
+NEXT_PUBLIC_IMG=https://surabaya.go.id
+
+# Internal backend URL (server-side only)
+BASE_API_URL=http://<internal-ip>:<port>/api/v1/
+
+# Security signature for backend authentication
+SIGNATURE=<your-signature-hash>
+
+# City identifier
+SBY_ID=1
+SURABAYA_SLUG=surabaya.go.id
+```
+
+### Project Structure
+
+```
+frontend/
+├── components/         # Reusable UI components
+│   ├── header.tsx
+│   ├── footer.tsx
+│   ├── layout.tsx
+│   ├── home.section1.tsx ... home.section7.tsx
+│   ├── carousel.*.tsx
+│   ├── news.*.tsx
+│   ├── media.*.tsx
+│   ├── wisata.tsx
+│   ├── infografis.*.tsx
+│   ├── search.tsx
+│   ├── pagination.tsx
+│   └── accessibility.tsx
+├── pages/
+│   ├── index.tsx
+│   ├── berita/
+│   ├── agenda/
+│   ├── wisata/
+│   ├── infografis/
+│   ├── photos/
+│   ├── videos/
+│   ├── podcasts/
+│   └── api/data/       # BFF proxy layer
+│       ├── news.tsx
+│       ├── agenda.tsx
+│       ├── menu.tsx
+│       └── webdisplay.tsx
+├── hooks/
+├── contexts/
+├── types/
+└── utils/
+    ├── axios.config.tsx
+    └── services/
+```
+
+---
+
+## Step Two: Backend-for-Frontend Pattern
+
+The BFF layer sits between the browser and the internal Surabaya backend APIs. All client requests go through Next.js API Routes — the internal API URLs and signature keys are never exposed to the browser.
+
+### Axios Configuration
+
+```typescript
+// utils/axios.config.tsx
+import axios, { AxiosInstance } from 'axios';
+
+const axiosConfig = (useInternalApi: boolean): AxiosInstance => {
+  const baseURL = useInternalApi
+    ? process.env.BASE_API_URL
+    : process.env.API_URL_WEBDISPLAY;
+
+  return axios.create({
+    baseURL,
+    headers: {
+      'Signature': process.env.SIGNATURE,
+      'Content-Type': 'application/json',
+    },
+  });
+};
+
+// Use internal Surabaya backend
+export const apiClient    = axiosConfig(true);
+
+// Use WebDisplay backend
+export const wdApiClient  = axiosConfig(false);
+```
+
+### BFF Proxy Route Example
+
+```typescript
+// pages/api/data/news.tsx
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { apiClient } from '@/utils/axios.config';
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  try {
+    const { category, page = 1, limit = 10 } = req.query;
+
+    const response = await apiClient.get('/news', {
+      params: { category, page, limit },
+    });
+
+    res.status(200).json(response.data);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch news' });
+  }
+}
+```
+
+---
+
+## Step Three: Data Fetching with React Query
+
+React Query manages all server state — caching, background refetching, and loading states — so components stay clean and declarative.
+
+### Service Layer
+
+```typescript
+// utils/services/news.tsx
+import axios from 'axios';
+
+export interface NewsParams {
+  category?: string;
+  page?: number;
+  limit?: number;
+}
+
+export const getNewsList = async (params: NewsParams) => {
+  const response = await axios.get('/api/data/news', { params });
+  return response.data;
+};
+
+export const getNewsDetail = async (slug: string) => {
+  const response = await axios.get(`/api/data/news/${slug}`);
+  return response.data;
+};
+```
+
+### Using React Query in Components
+
+```typescript
+// pages/berita/index.tsx
+import { useQuery } from '@tanstack/react-query';
+import { getNewsList } from '@/utils/services/news';
+
+const BeritaPage = () => {
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['news', { category: 'all', page: 1 }],
+    queryFn:  () => getNewsList({ category: 'all', page: 1 }),
+    staleTime: 5 * 60 * 1000, // cache for 5 minutes
+  });
+
+  if (isLoading) return <LoadingSpinner />;
+  if (isError)   return <ErrorMessage />;
+
+  return <NewsList articles={data.articles} />;
+};
+```
+
+---
+
+## Step Four: Page Routing
+
+The application uses Next.js file-based routing with dynamic segments for detail pages.
+
+### Route Map
+
+```
+/                        Home page
+/berita                  News list
+/berita/[slug]           News detail
+/agenda                  City events list
+/wisata                  Tourism information
+/infografis              Infographics list
+/photos                  Photo gallery
+/videos                  Video gallery
+/podcasts                Podcast gallery
+/api/data/news           BFF: news proxy
+/api/data/agenda         BFF: agenda proxy
+/api/data/menu           BFF: navigation menu proxy
+/api/data/webdisplay     BFF: webdisplay proxy
+```
+
+### Dynamic Route Example
+
+```typescript
+// pages/berita/[slug].tsx
+import { GetServerSideProps } from 'next';
+import { getNewsDetail } from '@/utils/services/news';
+
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+  const slug = params?.slug as string;
+
+  try {
+    const article = await getNewsDetail(slug);
+    return { props: { article } };
+  } catch {
+    return { notFound: true };
+  }
+};
+```
+
+---
+
+## Step Five: Key Components
+
+### Layout Wrapper
+
+```typescript
+// components/layout.tsx
+import Header from './header';
+import Footer from './footer';
+
+interface LayoutProps {
+  children: React.ReactNode;
+}
+
+const Layout = ({ children }: LayoutProps) => {
+  return (
+    <>
+      <Header />
+      <main>{children}</main>
+      <Footer />
+    </>
+  );
+};
+```
+
+### Component Reference
+
+| Component | Function |
+|---|---|
+| layout.tsx | Main page wrapper with header and footer |
+| header.tsx | Main navigation and menu |
+| carousel.main.tsx | Hero carousel on home page |
+| news.list.tsx | Article list with categories |
+| news.detail.redesign.tsx | Full article detail view |
+| wisata.tsx | Tourism destination list |
+| destination.tsx | Single destination detail |
+| media.player.video.tsx | Embedded video player |
+| media.player.audio.tsx | Podcast and audio player |
+| infografis.list.tsx | Infographic gallery |
+| search.tsx | Site-wide search |
+| pagination.tsx | Page navigation |
+| accessibility.tsx | Accessibility tools for disabled users |
+| popper.share.tsx | Social media share button |
+
+---
+
+## Step Six: Docker Deployment
+
+The project ships with a multi-stage Dockerfile and Docker Compose configuration for production deployment.
+
+### Docker Compose
+
+```yaml
+version: "3.8"
+services:
+  surabaya-frontend:
+    build: .
+    container_name: surabaya-frontend
+    ports:
+      - "3005:3005"
+    env_file:
+      - .env.production
+    volumes:
+      - /media/HDNFS/surabaya/uploads/images:/app/public/images
+    restart: always
+```
+
+### Dockerfile Multi-Stage Build
+
+```dockerfile
+# Stage 1: Dependencies
+FROM node:18-alpine AS deps
+WORKDIR /app
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
+
+# Stage 2: Build
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN yarn build
+
+# Stage 3: Production runner
+FROM node:18-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV production
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/public ./public
+EXPOSE 3005
+CMD ["node", "server.js"]
+```
+
+### Docker Configuration
+
+| Parameter | Value |
+|---|---|
+| Base Image | node:18-alpine |
+| Exposed Port | 3005 |
+| Output Mode | standalone (Next.js) |
+| Volume | uploads/images mapped to public/images |
+| Restart Policy | always |
+
+---
+
+## Optimization Tips
+
+### React Query Caching Strategy
+
+Tune stale time per data type — news changes frequently, menus almost never:
+
+```typescript
+// News: short cache, changes often
+useQuery({
+  queryKey: ['news'],
+  queryFn: getNewsList,
+  staleTime: 2 * 60 * 1000,  // 2 minutes
+});
+
+// Navigation menu: long cache, rarely changes
+useQuery({
+  queryKey: ['menu'],
+  queryFn: getMenu,
+  staleTime: 60 * 60 * 1000, // 1 hour
+});
+```
+
+### Security Headers
+
+```javascript
+// headers.js — HTTP security headers
+const securityHeaders = [
+  { key: 'X-DNS-Prefetch-Control',  value: 'on' },
+  { key: 'X-Frame-Options',         value: 'SAMEORIGIN' },
+  { key: 'X-Content-Type-Options',  value: 'nosniff' },
+  { key: 'Referrer-Policy',         value: 'strict-origin-when-cross-origin' },
+];
+
+module.exports = securityHeaders;
+```
+
+---
+
+## Conclusion
+
+The journey from a blank Next.js project to a production-ready city government platform requires architectural discipline at every level — from keeping internal API credentials server-side in a BFF layer, to organizing dozens of components across news, tourism, media, and civic services without losing maintainability.
+
+The key lesson from surabaya.go.id: **the BFF pattern is not optional for public government platforms**. Exposing internal API URLs and signature keys directly to the browser is a security risk no civic platform can afford. Proxy everything through the server, cache aggressively with React Query, and ship with Docker so the infrastructure is as reliable as the product.

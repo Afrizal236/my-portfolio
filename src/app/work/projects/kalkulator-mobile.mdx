@@ -1,0 +1,368 @@
+---
+title: "Building a Scientific Calculator with API Integration in Flutter"
+publishedAt: "2025-04-20"
+summary: "An enterprise-grade, polyglot microservices software system designed for massive scalability. G-NEXA orchestrates independent Go, NestJS, and Express services via blazing-fast gRPC communication, robust Redis caching layers, and a centralized Kong API Gateway."
+images:
+  - "/images/work/kalkulator/kalkulator2.png"
+team:
+  - name: "Afrizal Ramy Diaman"
+    role: "Mobile Developer"
+    avatar: "/images/avatar.png"
+    linkedIn: " "
+techStack:
+  - "Flutter"
+  - "Dart"
+  - "MathJS API"
+  - "HTTP"
+  - "dart:math"
+category: "Mobile"
+---
+
+## Overview
+
+Building a basic calculator that adds and subtracts is straightforward. Building one that handles trigonometric functions, logarithms, and high-precision computations — with a live API backend and a seamless offline fallback — is where real mobile engineering begins.
+
+**Kalkulator API RA** bridges this gap — it is a Flutter-based scientific calculator that offloads complex mathematical operations to the **MathJS API**, while gracefully degrading to local Dart computation when the network is unavailable. The result is a calculator that is both powerful and resilient, regardless of connectivity.
+
+This article covers the complete architecture: from API integration and fallback design to state management and error handling.
+
+---
+
+## The Calculator Architecture Pipeline
+
+```
++----------------+     +----------------+     +----------------+
+|   User Input   |     |   API Layer    |     |   Result       |
+|                |     |                |     |                |
+| Basic Mode     |---->| MathJS API     |---->| Display        |
+| Scientific Mode|     | (Primary)      |     | Formatted      |
+|                |     |                |     | Output         |
+| sin, cos, tan  |     | dart:math      |     |                |
+| log, ln, sqrt  |     | (Fallback)     |     | Error Message  |
++----------------+     +----------------+     +----------------+
+```
+
+---
+
+## Step One: Project Setup
+
+Before writing any logic, set up the Flutter project with the required dependencies.
+
+### Installing Dependencies
+
+Add the following to your `pubspec.yaml`:
+
+```yaml
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+```
+
+Then install:
+
+```bash
+flutter pub get
+```
+
+### Project File Structure
+
+```
+lib/
+├── main.dart                 # Entry point and main widget
+├── calculator_state.dart     # State management
+├── api_service.dart          # HTTP service layer
+└── utils/
+    ├── math_functions.dart   # Local math calculations
+    └── formatters.dart       # Number formatting utilities
+```
+
+---
+
+## Step Two: API Integration
+
+The calculator uses the **MathJS API** as its primary computation engine, sending raw expressions and receiving evaluated results.
+
+### API Service Layer
+
+```dart
+// api_service.dart
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+class ApiService {
+  static const String baseUrl = 'https://api.mathjs.org/v4/';
+  static const Duration timeout = Duration(seconds: 15);
+
+  static final Map<String, String> headers = {
+    'User-Agent': 'KalkulatorApiRA/1.0',
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+  };
+
+  static Future<String> evaluate(String expression) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl?expr=${Uri.encodeComponent(expression)}'),
+      headers: headers,
+    ).timeout(timeout);
+
+    if (response.statusCode == 200) {
+      return response.body;
+    }
+
+    throw Exception('API error: ${response.statusCode}');
+  }
+}
+```
+
+### Network Status Indicator
+
+The app checks connectivity at startup and provides a manual test button in the app bar:
+
+```dart
+// Network status states
+enum NetworkStatus { offline, online, loading }
+
+// Status indicator widget
+Widget buildStatusIndicator(NetworkStatus status) {
+  switch (status) {
+    case NetworkStatus.offline:
+      return Icon(Icons.wifi_off, color: Colors.red);
+    case NetworkStatus.online:
+      return Icon(Icons.wifi, color: Colors.green);
+    case NetworkStatus.loading:
+      return CircularProgressIndicator(strokeWidth: 2);
+  }
+}
+```
+
+---
+
+## Step Three: Fallback System
+
+When the API is unavailable, the app automatically switches to local computation using `dart:math`. The user experience remains uninterrupted.
+
+### Local Math Functions
+
+```dart
+// utils/math_functions.dart
+import 'dart:math' as math;
+
+class MathFunctions {
+
+  static double evaluate(String expression) {
+    // Basic arithmetic fallback
+    return _parseExpression(expression);
+  }
+
+  static double sin(double value, {bool isDegrees = true}) {
+    final radians = isDegrees ? value * math.pi / 180 : value;
+    return math.sin(radians);
+  }
+
+  static double cos(double value, {bool isDegrees = true}) {
+    final radians = isDegrees ? value * math.pi / 180 : value;
+    return math.cos(radians);
+  }
+
+  static double tan(double value, {bool isDegrees = true}) {
+    final radians = isDegrees ? value * math.pi / 180 : value;
+    return math.tan(radians);
+  }
+
+  static double log(double value) => math.log(value) / math.ln10;
+  static double ln(double value)  => math.log(value);
+  static double sqrt(double value) => math.sqrt(value);
+  static double pow2(double value) => math.pow(value, 2).toDouble();
+  static double pow3(double value) => math.pow(value, 3).toDouble();
+
+  // Mathematical constants
+  static const double pi = math.pi;
+  static const double e  = math.e;
+}
+```
+
+### Fallback Decision Logic
+
+```dart
+Future<String> calculate(String expression) async {
+  try {
+    // Try API first
+    final result = await ApiService.evaluate(expression);
+    return result;
+  } on SocketException {
+    // No internet — use local fallback
+    return MathFunctions.evaluate(expression).toString();
+  } on TimeoutException {
+    // API too slow — use local fallback
+    return MathFunctions.evaluate(expression).toString();
+  } catch (e) {
+    // Any other error — use local fallback
+    return MathFunctions.evaluate(expression).toString();
+  }
+}
+```
+
+---
+
+## Step Four: State Management
+
+The calculator state handles mode switching, input accumulation, and result display.
+
+### Calculator State
+
+```dart
+// calculator_state.dart
+class CalculatorState extends ChangeNotifier {
+  String _display    = '0';
+  String _expression = '';
+  bool _isScientific = false;
+  bool _isDegrees    = true;
+  NetworkStatus _networkStatus = NetworkStatus.loading;
+
+  // Toggle between Basic and Scientific mode
+  void toggleMode() {
+    _isScientific = !_isScientific;
+    notifyListeners();
+  }
+
+  // Toggle between Degrees and Radians
+  void toggleAngleMode() {
+    _isDegrees = !_isDegrees;
+    notifyListeners();
+  }
+
+  // Handle number and operator input
+  void onInput(String value) {
+    if (_display == '0' || _display == 'Error') {
+      _display = value;
+    } else {
+      _display += value;
+    }
+    notifyListeners();
+  }
+
+  // Clear all
+  void clear() {
+    _display    = '0';
+    _expression = '';
+    notifyListeners();
+  }
+
+  // Clear last entry
+  void clearEntry() {
+    if (_display.length > 1) {
+      _display = _display.substring(0, _display.length - 1);
+    } else {
+      _display = '0';
+    }
+    notifyListeners();
+  }
+}
+```
+
+---
+
+## Step Five: Error Handling
+
+The app handles multiple failure scenarios to ensure the user always receives a meaningful response.
+
+### Error Handling Strategy
+
+```dart
+String handleError(dynamic error) {
+  if (error is SocketException) {
+    return 'No internet connection';
+  }
+  if (error is TimeoutException) {
+    return 'Request timed out';
+  }
+  if (error is FormatException) {
+    return 'Invalid expression';
+  }
+  if (error.toString().contains('Division by zero')) {
+    return 'Cannot divide by zero';
+  }
+  return 'Calculation error';
+}
+```
+
+### Error Type Comparison
+
+| Error Type | Cause | Handling Strategy |
+|------------|-------|-------------------|
+| SocketException | No internet | Switch to local fallback |
+| TimeoutException | API too slow (15s) | Switch to local fallback |
+| FormatException | Invalid expression | Show error message |
+| HTTP Error | API unavailable | Switch to local fallback |
+| Division by zero | User input | Show protected message |
+
+---
+
+## Optimization Tips
+
+### Handle SSL in Development
+
+During development, you may encounter SSL certificate issues with the MathJS API. Use this override only in development — never in production:
+
+```dart
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
+
+// In main()
+void main() {
+  HttpOverrides.global = MyHttpOverrides();
+  runApp(MyApp());
+}
+```
+
+### Cache Repeated Expressions
+
+Avoid hitting the API for the same expression twice in the same session:
+
+```dart
+final Map<String, String> _cache = {};
+
+Future<String> calculate(String expression) async {
+  if (_cache.containsKey(expression)) {
+    return _cache[expression]!;
+  }
+
+  final result = await ApiService.evaluate(expression);
+  _cache[expression] = result;
+  return result;
+}
+```
+
+### Debounce Rapid Input
+
+Prevent firing API requests on every keystroke by debouncing the calculation trigger:
+
+```dart
+Timer? _debounce;
+
+void onExpressionChanged(String expression) {
+  if (_debounce?.isActive ?? false) _debounce!.cancel();
+  _debounce = Timer(const Duration(milliseconds: 500), () {
+    calculate(expression);
+  });
+}
+```
+
+---
+
+## Conclusion
+
+The journey from a basic four-function calculator to a resilient, API-backed scientific calculator requires careful thinking at every layer — from network handling and fallback strategies to state management and error boundaries.
+
+The key lesson from this project: **offline-first is not optional**. A calculator that stops working when the API is down is worse than no calculator at all. Design the fallback first, integrate the API second, and make sure the user never sees a broken state no matter what the network does.
