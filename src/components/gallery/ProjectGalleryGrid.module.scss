@@ -1,0 +1,169 @@
+/* ── Search bar ─────────────────────────────────────── */
+.searchWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 1rem;
+  font-size: 1rem;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.75rem 3rem 0.75rem 2.75rem;
+  background: var(--neutral-alpha-weak);
+  border: 1px solid var(--neutral-alpha-medium);
+  border-radius: var(--radius-l);
+  color: var(--neutral-on-background-strong);
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+
+  &::placeholder {
+    color: var(--neutral-on-background-weak);
+  }
+
+  &:focus {
+    border-color: var(--brand-alpha-medium);
+    box-shadow: 0 0 0 3px var(--brand-alpha-weak);
+  }
+}
+
+.clearBtn {
+  position: absolute;
+  right: 0.75rem;
+  background: var(--neutral-alpha-medium);
+  border: none;
+  border-radius: var(--radius-s);
+  color: var(--neutral-on-background-weak);
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+
+  &:hover {
+    background: var(--danger-alpha-weak);
+    color: var(--danger-on-background-strong);
+  }
+}
+
+/* ── Category filter pills ──────────────────────────── */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 1rem;
+  border-radius: 9999px;
+  border: 1px solid var(--neutral-alpha-medium);
+  background: transparent;
+  color: var(--neutral-on-background-weak);
+  font-size: 0.82rem;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  &:hover {
+    border-color: var(--brand-alpha-medium);
+    color: var(--brand-on-background-strong);
+    background: var(--brand-alpha-weak);
+  }
+}
+
+.pillActive {
+  border-color: var(--brand-solid-strong);
+  background: var(--brand-solid-strong);
+  color: var(--brand-on-solid-strong);
+
+  &:hover {
+    background: var(--brand-solid-strong);
+    color: var(--brand-on-solid-strong);
+    opacity: 0.9;
+  }
+}
+
+/* ── Tag filter pills (smaller, accent-colored) ─────── */
+.tagPill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.28rem 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid var(--neutral-alpha-medium);
+  background: transparent;
+  color: var(--neutral-on-background-weak);
+  font-size: 0.75rem;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  &:hover {
+    border-color: var(--accent-alpha-medium);
+    color: var(--accent-on-background-strong);
+    background: var(--accent-alpha-weak);
+  }
+}
+
+.tagPillActive {
+  border-color: var(--accent-solid-strong);
+  background: var(--accent-solid-strong);
+  color: #fff;
+
+  &:hover {
+    background: var(--accent-solid-strong);
+    color: #fff;
+    opacity: 0.9;
+  }
+}
+
+/* ── Project grid ───────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  width: 100%;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+.gridItem {
+  /* animate in when filtered */
+  animation: fadeSlideIn 0.3s ease both;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* stagger animation for each item */
+.gridItem:nth-child(1)  { animation-delay: 0.00s; }
+.gridItem:nth-child(2)  { animation-delay: 0.04s; }
+.gridItem:nth-child(3)  { animation-delay: 0.08s; }
+.gridItem:nth-child(4)  { animation-delay: 0.12s; }
+.gridItem:nth-child(5)  { animation-delay: 0.16s; }
+.gridItem:nth-child(6)  { animation-delay: 0.20s; }
+.gridItem:nth-child(7)  { animation-delay: 0.24s; }
+.gridItem:nth-child(8)  { animation-delay: 0.28s; }

@@ -1,6 +1,6 @@
 ---
 title: "A Web App That Helps Indonesian Students Write Formal Messages"
-publishedAt: "2025-09-10"
+publishedAt: "2024-09-10"
 summary: "A full-stack web application that helps Indonesian students and professionals craft polite, formal messages and letters for academic communication — complete with a politeness scoring system, automatic text correction, and PDF export, built with React.js and Node.js."
 tag: "Web Development"
 images:
@@ -9,46 +9,46 @@ images:
 
 # Helping Indonesian Students Communicate Professionally
 
-Who hasn't been in this situation? You need to ask your lecturer for a 
-deadline extension, but you're not sure how to phrase it politely. You 
-type and retype, second-guessing every word. Is this too casual? Too stiff? 
+Who hasn't been in this situation? You need to ask your lecturer for a
+deadline extension, but you're not sure how to phrase it politely. You
+type and retype, second-guessing every word. Is this too casual? Too stiff?
 Will it come across as rude?
 
-This is a real and common problem for Indonesian university students — and 
-it's exactly what **Generator Kalimat Sopan** solves. A web application 
-that helps students and professionals craft formal, polite, and 
+This is a real and common problem for Indonesian university students — and
+it's exactly what **Generator Kalimat Sopan** solves. A web application
+that helps students and professionals craft formal, polite, and
 contextually appropriate messages to lecturers and superiors — instantly.
 
 ## What the App Does
 
-Generator Kalimat Sopan is divided into three core modules, each targeting 
+Generator Kalimat Sopan is divided into three core modules, each targeting
 a different communication need:
 
-**Template Generator** is the quickest way to get a polished sentence. 
-Users pick a scenario — sick leave, deadline extension, consultation 
-request, or thank you — fill in their personal details like name, NIM, 
-class, and lecturer's name, and the app instantly generates a complete, 
+**Template Generator** is the quickest way to get a polished sentence.
+Users pick a scenario — sick leave, deadline extension, consultation
+request, or thank you — fill in their personal details like name, NIM,
+class, and lecturer's name, and the app instantly generates a complete,
 contextually appropriate polite sentence ready to copy and send.
 
-**Formal Letter Generator** takes it a step further. For situations that 
-require an official written document, this module produces a fully 
-formatted formal Indonesian academic letter. Users select the letter type, 
-complete the required fields, and receive a print-ready document that can 
-be downloaded as a PDF or printed directly from the browser via the built-in 
+**Formal Letter Generator** takes it a step further. For situations that
+require an official written document, this module produces a fully
+formatted formal Indonesian academic letter. Users select the letter type,
+complete the required fields, and receive a print-ready document that can
+be downloaded as a PDF or printed directly from the browser via the built-in
 print preview feature.
 
-**Text Analyzer** is the most intelligent part of the application. Users 
-paste any message they've written and the system runs a politeness analysis, 
-returning a score from 0 to 100. The analyzer detects inappropriate words 
-(penalizing up to -40 points per word), informal language (-3 to -10 points 
-per word), and checks for the presence of proper formal structure like 
-greetings and closings (-15 points if missing). Beyond scoring, it flags 
-the specific problematic words, explains why they're unsuitable, and offers 
+**Text Analyzer** is the most intelligent part of the application. Users
+paste any message they've written and the system runs a politeness analysis,
+returning a score from 0 to 100. The analyzer detects inappropriate words
+(penalizing up to -40 points per word), informal language (-3 to -10 points
+per word), and checks for the presence of proper formal structure like
+greetings and closings (-15 points if missing). Beyond scoring, it flags
+the specific problematic words, explains why they're unsuitable, and offers
 both manual suggestions and an automatic rewrite in formal Indonesian.
 
 ## Politeness Scoring System
 
-The scoring system is designed to give users actionable, not just 
+The scoring system is designed to give users actionable, not just
 numerical, feedback:
 
 - **80–100**: The text is highly formal and appropriate to send as-is.
@@ -57,23 +57,25 @@ numerical, feedback:
 
 ## Technology Used
 
-This project is a full-stack web application built with a React frontend 
+This project is a full-stack web application built with a React frontend
 and a Node.js + Express backend:
 
 **Frontend:**
+
 - **React.js** — Component-based UI for the three main tabs
 - **CSS3** — Responsive design with gradient styling
 - **jsPDF** — Client-side PDF generation for formal letter export
 - **Axios** — HTTP client for communicating with the backend API
 
 **Backend:**
-- **Node.js + Express.js** — REST API server handling template generation, 
+
+- **Node.js + Express.js** — REST API server handling template generation,
   letter rendering, and politeness analysis logic
 - **CORS + dotenv** — Cross-origin support and environment configuration
 
 ## Further Development Ideas
 
-This project is a solid foundation for a broader communication assistant. 
+This project is a solid foundation for a broader communication assistant.
 Some features that could be added later:
 
 - Support for regional Indonesian languages (Javanese, Sundanese).
@@ -82,33 +84,33 @@ Some features that could be added later:
 - Mobile-first redesign for on-the-go use.
 - Integration with WhatsApp or email for direct sending.
 
-Communicating professionally is a skill — and like any skill, it can be 
-learned. Generator Kalimat Sopan makes that process easier, one polite 
+Communicating professionally is a skill — and like any skill, it can be
+learned. Generator Kalimat Sopan makes that process easier, one polite
 sentence at a time.
 
 ## Conclusion
 
-Building Generator Kalimat Sopan was a reminder that the best software 
-solves problems people actually face every day. The challenge of writing 
-a polite, formal message to a lecturer might seem trivial from the outside 
-— but for many Indonesian students, it's a genuine source of anxiety that 
+Building Generator Kalimat Sopan was a reminder that the best software
+solves problems people actually face every day. The challenge of writing
+a polite, formal message to a lecturer might seem trivial from the outside
+— but for many Indonesian students, it's a genuine source of anxiety that
 affects how they communicate and advocate for themselves academically.
 
-What made this project technically interesting was the text analysis 
-engine. Building a rule-based scoring system that doesn't just flag bad 
-words but actually understands formality levels, structural completeness, 
-and context — and then suggests specific improvements — pushed the backend 
+What made this project technically interesting was the text analysis
+engine. Building a rule-based scoring system that doesn't just flag bad
+words but actually understands formality levels, structural completeness,
+and context — and then suggests specific improvements — pushed the backend
 logic well beyond a simple CRUD application.
 
-The combination of React on the frontend and Node.js + Express on the 
-backend proved to be the right choice for this kind of interactive, 
-real-time tool. jsPDF in particular was a satisfying addition — giving 
-users a tangible, print-ready output made the whole experience feel 
+The combination of React on the frontend and Node.js + Express on the
+backend proved to be the right choice for this kind of interactive,
+real-time tool. jsPDF in particular was a satisfying addition — giving
+users a tangible, print-ready output made the whole experience feel
 complete and practical rather than just a demo.
 
-If there's one takeaway from this project, it's that communication tools 
-built for a specific cultural and academic context will always outperform 
-generic alternatives. A tool that understands Indonesian academic etiquette, 
-knows the difference between formal and informal Bahasa Indonesia, and 
-produces output that actually sounds human — that's the kind of specificity 
+If there's one takeaway from this project, it's that communication tools
+built for a specific cultural and academic context will always outperform
+generic alternatives. A tool that understands Indonesian academic etiquette,
+knows the difference between formal and informal Bahasa Indonesia, and
+produces output that actually sounds human — that's the kind of specificity
 that makes software genuinely useful.

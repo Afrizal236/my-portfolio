@@ -220,21 +220,6 @@ const about = {
             intelligent, data-powered automation.
           </>,
         ],
-        images: [
-          // optional: leave the array empty if you don't want to display images
-          {
-            src: "/images/work/dewo-robotic1.jpg",
-            alt: "All Team",
-            width: 16,
-            height: 9,
-          },
-          {
-            src: "/images/work/dewo-robotic2.jpg",
-            alt: "All Team",
-            width: 16,
-            height: 9,
-          },
-        ],
       },
     ],
   },
@@ -254,32 +239,64 @@ const about = {
     skills: [
       {
         title: "Languages",
-        description: <>JavaScript | TypeScript | Python | C++</>,
+        description: (
+          <>JavaScript | TypeScript | Python | Dart | PHP | XML | C++</>
+        ),
         images: [],
       },
       {
-        title: "Frontend Frameworks",
-        description: <>React.js | Next.js</>,
+        title: "Frontend",
+        description: (
+          <>
+            React.js | Next.js | Next.js 14 | Material UI | React Query | Axios
+            | HTML | CSS | Leaflet.js
+          </>
+        ),
         images: [],
       },
       {
-        title: "Backend Frameworks",
-        description: <>Node.js | Express.js | NestJS</>,
+        title: "Backend & API",
+        description: (
+          <>
+            Node.js | Express.js | NestJS | FastAPI | Socket.IO | JWT |
+            NextAuth.js | QWeb (Odoo) | Odoo 19
+          </>
+        ),
         images: [],
       },
       {
-        title: "Database & ORM",
-        description: <>PostgreSQL | Redis | SQL | NoSQL</>,
+        title: "Mobile",
+        description: (
+          <>
+            Flutter | Firebase | Cloud Firestore | SQLite | Provider | YouTube
+            Player
+          </>
+        ),
         images: [],
       },
       {
-        title: "Architecture & DevOps",
-        description: <>Docker | Git</>,
+        title: "Database & Storage",
+        description: (
+          <>
+            PostgreSQL | MySQL | Redis | SQLite | SQLAlchemy | Alembic |
+            Cloudflare R2
+          </>
+        ),
         images: [],
       },
       {
-        title: "Machine Learning & Services",
-        description: <>TensorFlow | OpenCV | Scikit-learn | FastAPI | Streamlit </>,
+        title: "AI / ML & Data",
+        description: (
+          <>
+            PyTorch | scikit-learn | CLIP | Google Gemini | FLUX | FastAPI |
+            TensorFlow | OpenCV | Streamlit
+          </>
+        ),
+        images: [],
+      },
+      {
+        title: "DevOps & Tools",
+        description: <>Docker | Git | XAMPP | Figma</>,
         images: [],
       },
     ],

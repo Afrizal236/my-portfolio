@@ -27,6 +27,7 @@ interface ProjectCardProps {
 
 export const ProjectCard: React.FC<ProjectCardProps> = ({
   href,
+  priority,
   images = [],
   title,
   content,
@@ -48,6 +49,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
               alt={title}
               aspectRatio="16 / 9"
               className={styles.image}
+              priority={priority}
             />
             <div className={styles.overlay}>
               <Text variant="body-default-xs" className={styles.overlayText}>

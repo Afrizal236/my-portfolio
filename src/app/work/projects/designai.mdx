@@ -1,0 +1,702 @@
+---
+title: "Building DesignAI — An AI-Powered Design Generation Platform with Next.js and FastAPI"
+publishedAt: "2026-06-18"
+summary: "A complete breakdown of building a full-featured AI design platform with text-to-image generation, multimodal AI recommendations, semantic search, CLIP deep learning scoring, genetic prompt evolution, fuzzy credit system, and Cloudflare R2 storage — built with Next.js 14, FastAPI, PostgreSQL, and Redis."
+images:
+  - "/images/work/designai/designku.png"
+  - "/images/work/designai/landing-page2.png"
+  - "/images/work/designai/register-page.png"
+  - "/images/work/designai/login-page.png"
+  - "/images/work/designai/generate.png"
+  - "/images/work/designai/recommendations.png"
+  - "/images/work/designai/dashboard-page.png"
+  - "/images/work/designai/design-cluster.png"
+  - "/images/work/designai/association rules.png"
+  - "/images/work/designai/trend-analysis.png"
+  - "/images/work/designai/smart-prompt.png"
+  - "/images/work/designai/fuzzy-scoring-smart-prompt.png"
+  - "/images/work/designai/genetic-algorithm-smart-prompt.png"
+  - "/images/work/designai/fuzzy-rating-predictor-smart-prompt.png"
+  - "/images/work/designai/Business-Intelligence-Dashboard.png"
+  - "/images/work/designai/deep-learning1.png"
+  - "/images/work/designai/deep-learning2.png"
+  - "/images/work/designai/semantic search.png"
+
+team:
+  - name: "Afrizal Ramy Diaman"
+    role: "Full Stack Developer"
+    avatar: "/images/avatar.png"
+    linkedIn: " "
+techStack:
+  - "Next.js 14"
+  - "TypeScript"
+  - "FastAPI"
+  - "Python"
+  - "PostgreSQL"
+  - "Redis"
+  - "SQLAlchemy"
+  - "Alembic"
+  - "Cloudflare R2"
+  - "Google Gemini"
+  - "FLUX (NanoBanana)"
+  - "CLIP"
+  - "PyTorch"
+  - "scikit-learn"
+  - "NextAuth.js"
+  - "Docker"
+category: "Full-Stack"
+---
+
+**GitHub Repositories:**
+
+```bash
+# Backend (FastAPI)
+git clone https://github.com/Afrizal236/apidesignai-ver2.git
+
+# Frontend (Next.js)
+git clone https://github.com/Afrizal236/DesignAI-ver2.git
+```
+
+## Overview
+
+Building a page that displays a generated image is straightforward. Building a complete AI-powered design platform that generates images from text, analyzes uploaded references with multimodal AI, scores image-prompt alignment using CLIP, evolves prompts using genetic algorithms, ranks recommendations with fuzzy logic, and indexes everything for semantic search — that is where AI engineering meets product thinking.
+
+**DesignAI** bridges this gap — a full-stack AI design generation platform built with **Next.js 14** on the frontend and **FastAPI** on the backend. Users describe a design idea in natural language, and the system transforms it into a high-quality product image using **Google Gemini** for prompt enhancement and **FLUX via NanoBanana** for image synthesis. Every generated image is stored in **Cloudflare R2** and indexed for future semantic retrieval.
+
+This article covers the complete architecture: from the FastAPI route structure and async database patterns to multimodal AI pipelines, CLIP scoring, genetic prompt evolution, and the Next.js proxy patterns that make cross-origin downloads work seamlessly.
+
+---
+
+## The DesignAI Architecture Pipeline
+
+```
++--------------------+     +----------------------+     +-------------------+
+|   Frontend         |     |   Backend API        |     |   External AI     |
+|   (Next.js 14)     |     |   (FastAPI + Python) |     |   Services        |
+|                    |     |                      |     |                   |
+| /generate          |---->| POST /api/generate   |---->| Google Gemini     |
+| /recommendation    |     | POST /api/recommend  |     | (prompt enhance)  |
+| /deep-learning     |     | POST /api/dl/clip    |     |                   |
+| /smart-prompt      |     | POST /api/evolve     |     | NanoBanana FLUX   |
+| /semantic-search   |     | GET  /api/vsm-search |     | (image synthesis) |
+| /analytics         |     | GET  /api/analytics  |     |                   |
+| /dashboard         |     | GET  /api/dashboard  |     | CLIP (PyTorch)    |
++--------------------+     +----------------------+     | (similarity score)|
+                                    |                   +-------------------+
+                                    v
+                           +-------------------+
+                           |   Data Layer      |
+                           |                   |
+                           | PostgreSQL        |
+                           | (generation logs) |
+                           |                   |
+                           | Redis             |
+                           | (rate limit +     |
+                           |  cache dashboard) |
+                           |                   |
+                           | Cloudflare R2     |
+                           | (image storage)   |
+                           +-------------------+
+```
+
+---
+
+## Step One: Project Setup
+
+### Backend Dependencies
+
+```text
+# Web Framework
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+python-multipart==0.0.12
+
+# Data Validation
+pydantic==2.9.0
+pydantic-settings==2.5.2
+
+# AI
+google-genai==2.8.0
+replicate==1.0.7
+
+# Database — PostgreSQL + SQLAlchemy async
+sqlalchemy[asyncio]==2.0.36
+asyncpg==0.29.0
+alembic==1.13.3
+
+# Redis
+redis[hiredis]==5.1.1
+
+# Auth
+passlib[bcrypt]==1.7.4
+python-jose[cryptography]==3.3.0
+
+# Object Storage — Cloudflare R2 (S3-compatible)
+boto3==1.35.36
+
+# Data Mining
+scikit-learn==1.5.2
+mlxtend==0.23.1
+pandas==2.2.3
+numpy==1.26.4
+
+# Deep Learning — CLIP + LSTM
+torch>=2.0.0
+torchvision>=0.15.0
+transformers>=4.35.0
+pillow>=10.0.0
+```
+
+### Backend Project Structure
+
+```
+apidesignai/
+├── main.py                      # FastAPI app, CORS, lifespan
+├── core/
+│   ├── config.py                # Pydantic Settings (env-driven config)
+│   ├── auth.py                  # JWT auth middleware
+│   └── redis.py                 # Redis connection pool
+├── database/
+│   ├── session.py               # Async SQLAlchemy engine
+│   └── base.py                  # Declarative base
+├── models/
+│   ├── user.py                  # User model
+│   ├── generation.py            # GenerationHistory model
+│   └── saved_design.py          # SavedDesign model
+├── routes/
+│   ├── generate.py              # POST /api/generate
+│   ├── recommendation.py        # POST /api/recommendation
+│   ├── dashboard.py             # GET  /api/dashboard
+│   ├── analytics.py             # GET  /api/analytics
+│   ├── search.py                # GET  /api/search
+│   ├── vsm_search.py            # GET  /api/vsm-search
+│   ├── evolve.py                # POST /api/evolve
+│   ├── deep_learning.py         # POST /api/dl/clip
+│   ├── bi.py                    # GET  /api/bi/export
+│   ├── credits.py               # GET/POST /api/credits
+│   ├── ratings.py               # POST /api/ratings
+│   ├── limits.py                # GET  /api/limits/status/:feature
+│   └── auth_route.py            # POST /api/auth/login, /register
+├── schemas/                     # Pydantic request/response schemas
+├── services/
+│   ├── generate_service.py      # Prompt enhance + image generate orchestrator
+│   ├── prompt_service.py        # Gemini prompt enhancement
+│   ├── nanobanana_service.py    # FLUX image generation (NanoBanana API)
+│   ├── recommendation_service.py# Multimodal AI recommendation pipeline
+│   ├── storage_service.py       # Cloudflare R2 upload/delete
+│   ├── clip_service.py          # CLIP image-text similarity scoring
+│   ├── lstm_service.py          # LSTM-based prediction model
+│   ├── genetic_prompt_service.py# Genetic algorithm prompt evolution
+│   ├── fuzzy_credit_service.py  # Fuzzy logic credit scoring
+│   ├── rating_predictor_service.py # Rating prediction model
+│   ├── vsm_service.py           # Vector Space Model search
+│   └── recommendation_service.py# AI product recommendation
+└── alembic/                     # Database migrations
+```
+
+### Frontend Project Structure
+
+```
+designai/
+├── app/
+│   ├── page.tsx                 # Landing page
+│   ├── generate/page.tsx        # Text-to-image generator
+│   ├── recommendation/page.tsx  # AI design recommendation
+│   ├── deep-learning/page.tsx   # CLIP similarity scoring
+│   ├── smart-prompt/page.tsx    # Genetic prompt evolution
+│   ├── semantic-search/page.tsx # VSM semantic search
+│   ├── dashboard/page.tsx       # User dashboard + gallery
+│   ├── analytics/page.tsx       # Analytics & charts
+│   ├── admin/bi/page.tsx        # Business intelligence / CSV export
+│   ├── login/page.tsx           # Auth (credentials + Google OAuth)
+│   ├── register/page.tsx        # Registration
+│   └── api/
+│       └── download/route.ts    # Next.js proxy for R2 image download
+├── components/
+│   ├── Navbar.tsx
+│   ├── Footer.tsx
+│   └── SpotlightCard.tsx
+└── .env.local
+```
+
+---
+
+## Step Two: Configuration with Pydantic Settings
+
+All backend configuration is driven by environment variables, loaded via Pydantic Settings. The `R2_ENABLED` property guards every R2 operation so the app still runs when storage is not configured.
+
+```python
+# core/config.py
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",
+    )
+
+    # Cloudflare R2
+    R2_ACCOUNT_ID: str = ""
+    R2_ACCESS_KEY_ID: str = ""
+    R2_SECRET_ACCESS_KEY: str = ""
+    R2_BUCKET_NAME: str = "designai-images"
+    R2_PUBLIC_URL: str = ""   # e.g. https://designai.unesa.dev
+
+    @property
+    def R2_ENDPOINT_URL(self) -> str:
+        return f"https://{self.R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+
+    @property
+    def R2_ENABLED(self) -> bool:
+        return bool(
+            self.R2_ACCOUNT_ID and self.R2_ACCESS_KEY_ID
+            and self.R2_SECRET_ACCESS_KEY and self.R2_PUBLIC_URL
+        )
+
+    # Multi-key rotation for Gemini and NanoBanana
+    GEMINI_API_KEYS: str = ""   # "key1,key2,key3"
+
+    @property
+    def GEMINI_KEY_LIST(self) -> list[str]:
+        keys = [k.strip() for k in self.GEMINI_API_KEYS.split(",") if k.strip()]
+        return keys or ([self.GEMINI_API_KEY] if self.GEMINI_API_KEY else [])
+
+settings = Settings()
+```
+
+---
+
+## Step Three: Image Generation Pipeline
+
+The generation pipeline has two branches: text-only and multimodal (text + reference image).
+
+### Text-Only Flow
+
+```
+User Prompt → Gemini Enhance → NanoBanana FLUX → R2 Upload → DB Save → Response
+```
+
+### Multimodal Flow (Reference Image)
+
+```
+User Prompt + Image → Gemini Vision Analysis → Merged Prompt → NanoBanana FLUX → R2 Upload
+```
+
+### Generate Route
+
+```python
+# routes/generate.py
+@router.post("", response_model=GenerateResponse)
+async def generate_image(
+    prompt: str = Form(..., min_length=3, max_length=1000),
+    model: str = Form(default="hd"),
+    reference_image: UploadFile | None = File(default=None),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    # Read and validate reference image
+    image_bytes = None
+    if reference_image and reference_image.filename:
+        image_bytes = await reference_image.read()
+        # size validation...
+
+    # Run the generation pipeline
+    result = await generate_image_from_prompt(
+        prompt=prompt,
+        model_id=model,
+        image_bytes=image_bytes,
+        image_mime=image_mime,
+    )
+
+    # Persist to database
+    record = GenerationHistory(
+        user_id=current_user.id,
+        prompt=result["prompt_used"],
+        enhanced_prompt=result.get("enhanced_prompt"),
+        model_used=result["model_used"],
+        image_url=result["image_url"] if result["success"] else None,
+        status="success" if result["success"] else "failed",
+        generation_time_ms=result["generation_time_ms"],
+    )
+    db.add(record)
+    await db.commit()
+
+    return GenerateResponse(**result)
+```
+
+---
+
+## Step Four: AI Recommendation Pipeline
+
+The recommendation system uses Gemini Vision to analyze an uploaded image and dynamically select the 3 most fitting product categories, then generates a design image for each — all in parallel.
+
+```
+Upload Image → Gemini Vision → Select 3 Products → [FLUX Generate] (parallel) → R2 Upload × 3
+```
+
+**Auto Mode** (image-only): Gemini reads the style, color, and mood, then picks products autonomously.
+
+**Manual Mode** (image + prompt): The user adds a direction (e.g., _"make it gothic dark"_) that steers Gemini's product selection.
+
+```python
+# routes/recommendation.py
+@router.post("")
+async def get_recommendation(file: UploadFile = File(...), ...):
+    result = await analyze_image(image_bytes, file.content_type)
+
+    # Save each generated product to history
+    for i, product in enumerate(result["products"]):
+        model_prefix = "recommendation" if i == 0 else "recommendation-gallery"
+        record = GenerationHistory(
+            user_id=current_user.id,
+            model_used=f"{model_prefix}/{product.get('id')}",
+            image_url=product.get("image_url"),
+            ...
+        )
+        db.add(record)
+    await db.commit()
+
+@router.post("/manual")
+async def get_recommendation_manual(
+    file: UploadFile = File(...),
+    prompt: str = Form(...),  # User direction
+    ...
+):
+    result = await analyze_image_with_prompt(image_bytes, file.content_type, prompt)
+    ...
+```
+
+---
+
+## Step Five: Cloudflare R2 Storage
+
+Images are stored in Cloudflare R2 using the S3-compatible API via `boto3`. Every upload is async (via `asyncio.to_thread`) since boto3 is synchronous.
+
+```python
+# services/storage_service.py
+import asyncio, uuid, boto3
+from datetime import datetime
+
+def _build_object_key(model_id: str, file_ext: str = "png") -> str:
+    now = datetime.utcnow()
+    date_path = now.strftime("%Y/%m/%d")
+    safe_model = model_id.replace("/", "-").replace(":", "-")
+    return f"images/{date_path}/{safe_model}_{uuid.uuid4()}.{file_ext}"
+
+async def upload_image(image_bytes: bytes, model_id: str = "hd") -> dict:
+    if not settings.R2_ENABLED:
+        return {"success": False, "url": None, "message": "R2 not configured"}
+
+    object_key = _build_object_key(model_id, file_ext)
+
+    # Run boto3 in thread pool to avoid blocking the event loop
+    await asyncio.to_thread(_upload_sync, image_bytes, object_key, content_type)
+
+    public_url = f"{settings.R2_PUBLIC_URL.rstrip('/')}/{object_key}"
+    return {"success": True, "url": public_url, "object_key": object_key}
+```
+
+---
+
+## Step Six: CLIP Deep Learning — Image-Text Similarity
+
+The `/deep-learning` feature lets users measure how well a generated image matches its prompt. It uses OpenAI's **CLIP** model via PyTorch + Hugging Face Transformers.
+
+```
+User provides image_url + prompt → CLIP encodes both → cosine similarity → score (0–100)
+```
+
+The score gives actionable feedback: low scores suggest the prompt needs more specificity; high scores confirm strong alignment between the visual output and the original intent.
+
+---
+
+## Step Seven: Genetic Prompt Evolution
+
+The `/smart-prompt` feature uses a genetic algorithm to evolve a base prompt into higher-quality variants.
+
+```
+Base Prompt
+    → Initial population (N variants)
+        → Fitness evaluation (Gemini scores each variant)
+            → Selection → Crossover → Mutation
+                → Next generation
+                    → Best prompt returned
+```
+
+```python
+# services/genetic_prompt_service.py
+# Conceptual structure:
+
+class GeneticPromptEvolver:
+    def __init__(self, base_prompt: str, generations: int = 5, population_size: int = 8):
+        self.base_prompt = base_prompt
+        self.generations = generations
+        self.population_size = population_size
+
+    async def evolve(self) -> dict:
+        population = self._initialize_population()
+        for gen in range(self.generations):
+            scored = await self._evaluate_fitness(population)
+            parents = self._select_parents(scored)
+            population = self._crossover_and_mutate(parents)
+        return self._best(population)
+```
+
+---
+
+## Step Eight: Fuzzy Credit System
+
+Credits are not simply decremented by 1 per action. A **fuzzy logic** engine evaluates multiple factors — model used, image complexity, generation time — and determines the credit cost dynamically.
+
+```
+Input factors → Fuzzification → Fuzzy inference rules → Defuzzification → Credit cost
+```
+
+This allows the system to charge proportionally to actual resource consumption rather than a flat rate.
+
+---
+
+## Step Nine: Dashboard with Redis Caching
+
+The dashboard aggregates stats, recent activity, gallery items, and saved prompts in a single endpoint. Results are cached in Redis for 60 seconds to avoid repeated heavy DB queries.
+
+```python
+# routes/dashboard.py (conceptual)
+CACHE_KEY = "dashboard:{user_id}"
+
+async def get_dashboard(current_user: User, db: AsyncSession, redis: Redis):
+    cached = await redis.get(CACHE_KEY.format(user_id=current_user.id))
+    if cached:
+        return json.loads(cached)
+
+    # Build fresh dashboard data from DB
+    data = await build_dashboard_data(db, current_user)
+
+    await redis.setex(
+        CACHE_KEY.format(user_id=current_user.id),
+        settings.CACHE_DASHBOARD_TTL,  # 60 seconds
+        json.dumps(data)
+    )
+    return data
+```
+
+---
+
+## Step Ten: Image Download via Next.js Proxy
+
+Because the generated images are served from Cloudflare R2 (`https://designai.unesa.dev`), direct browser download with a `<a download>` tag fails due to CORS. The solution is a Next.js API route that acts as a server-side proxy.
+
+### How It Works
+
+```
+Browser click Download
+  → fetch("/api/download?url=<R2_URL>")
+      → Next.js route.ts fetches image from R2 (server-side, no CORS)
+          → Returns blob with Content-Disposition: attachment
+              → Browser triggers file download ✅
+```
+
+### Proxy Route
+
+```typescript
+// app/api/download/route.ts
+export async function GET(req: NextRequest) {
+  const imageUrl = new URL(req.url).searchParams.get("url");
+
+  // Whitelist: only allow downloads from our own R2 domain
+  const allowed = ["https://designai.unesa.dev"];
+  if (!allowed.some((d) => imageUrl.startsWith(d))) {
+    return NextResponse.json({ error: "Domain not allowed" }, { status: 403 });
+  }
+
+  const response = await fetch(imageUrl, { cache: "no-store" });
+  const buffer = await response.arrayBuffer();
+
+  return new NextResponse(buffer, {
+    status: 200,
+    headers: {
+      "Content-Type": response.headers.get("content-type") ?? "image/png",
+      "Content-Disposition": "attachment",
+      "Cache-Control": "no-store",
+    },
+  });
+}
+```
+
+### Download Handler in Dashboard
+
+```typescript
+// app/dashboard/page.tsx
+const handleDownload = async (imageUrl: string) => {
+  const fileName = buildFileName(); // "DesignAI Image Jun 18, 2026, 06_30_00 PM.png"
+  try {
+    const response = await fetch(
+      `/api/download?url=${encodeURIComponent(imageUrl)}`,
+    );
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const blob = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = objectUrl;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(objectUrl);
+  } catch {
+    window.open(imageUrl, "_blank"); // Fallback
+  }
+};
+```
+
+---
+
+## Step Eleven: Authentication
+
+Authentication uses **NextAuth.js** on the frontend with a **JWT + custom backend** pattern. Users can sign in with credentials (email/password) or Google OAuth. The access token is forwarded to every backend API call.
+
+```typescript
+// app/api/auth/[...nextauth]/route.ts (conceptual)
+export const authOptions = {
+  providers: [
+    GoogleProvider({ clientId: process.env.GOOGLE_CLIENT_ID }),
+    CredentialsProvider({
+      authorize: async (credentials) => {
+        const res = await fetch("http://localhost:8000/api/auth/login", {
+          method: "POST",
+          body: JSON.stringify(credentials),
+        });
+        return res.ok ? res.json() : null;
+      },
+    }),
+  ],
+  callbacks: {
+    jwt: async ({ token, user }) => {
+      if (user) token.accessToken = user.accessToken;
+      return token;
+    },
+    session: async ({ session, token }) => {
+      session.accessToken = token.accessToken;
+      return session;
+    },
+  },
+};
+```
+
+---
+
+## Step Twelve: Rate Limiting with Redis
+
+Every feature has a daily usage limit tracked per user in Redis. Limits reset at midnight UTC.
+
+```python
+# routes/limits.py
+@router.get("/status/{feature}")
+async def get_limit_status(
+    feature: str,  # "generate" | "recommendation"
+    current_user: User = Depends(get_current_user),
+):
+    redis_key = f"limit:{feature}:{current_user.id}:{today()}"
+    used_today = int(await redis.get(redis_key) or 0)
+    daily_limit = settings.RATE_LIMIT_GENERATE  # e.g. 10
+
+    return {
+        "used_today": used_today,
+        "daily_limit": daily_limit,
+        "remaining": max(0, daily_limit - used_today),
+    }
+```
+
+The frontend displays this in real time on the dashboard and plan banner, showing a progress bar that turns red when the limit is reached.
+
+---
+
+## API Endpoints Reference
+
+| Method   | Endpoint                        | Description                                              |
+| -------- | ------------------------------- | -------------------------------------------------------- |
+| `POST`   | `/api/generate`                 | Text-to-image generation (with optional reference image) |
+| `POST`   | `/api/recommendation`           | Auto AI product recommendation from image                |
+| `POST`   | `/api/recommendation/manual`    | Manual AI recommendation with user direction             |
+| `POST`   | `/api/evolve`                   | Genetic algorithm prompt evolution                       |
+| `POST`   | `/api/dl/clip`                  | CLIP image-text similarity scoring                       |
+| `GET`    | `/api/dashboard`                | User dashboard (stats, gallery, activity)                |
+| `GET`    | `/api/analytics`                | Usage analytics & trends                                 |
+| `GET`    | `/api/search`                   | Semantic search across generations                       |
+| `GET`    | `/api/vsm-search`               | Vector Space Model search                                |
+| `GET`    | `/api/credits`                  | Credit balance & history                                 |
+| `GET`    | `/api/limits/status/:feature`   | Daily limit status per feature                           |
+| `GET`    | `/api/bi/export`                | Business intelligence CSV export                         |
+| `POST`   | `/api/ratings`                  | Submit rating for a generation                           |
+| `POST`   | `/api/auth/login`               | JWT login                                                |
+| `POST`   | `/api/auth/register`            | User registration                                        |
+| `DELETE` | `/api/dashboard/generation/:id` | Delete generation from dashboard                         |
+
+---
+
+## Performance Notes
+
+| Optimization                | Technique                                      |
+| --------------------------- | ---------------------------------------------- |
+| Dashboard load              | Redis cache (60s TTL)                          |
+| API key exhaustion          | Multi-key rotation (comma-separated keys)      |
+| R2 upload blocking          | `asyncio.to_thread` wraps synchronous boto3    |
+| Parallel image generation   | `asyncio.gather` for recommendation (3 images) |
+| Cross-origin image download | Next.js server-side proxy route                |
+| Daily limit tracking        | Redis atomic increments with TTL               |
+| DB queries                  | SQLAlchemy async + asyncpg driver              |
+
+---
+
+## Running Locally
+
+### Backend
+
+```bash
+cd apidesignai
+
+# Create virtual environment
+python -m venv venv312
+venv312\Scripts\activate  # Windows
+# source venv312/bin/activate  # Linux/Mac
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Copy and fill environment variables
+cp .env.example .env
+
+# Run database migrations
+alembic upgrade head
+
+# Start the server
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+
+### Frontend
+
+```bash
+cd designai
+
+# Install dependencies
+npm install
+
+# Copy and fill environment variables
+cp .env.local.example .env.local
+
+# Start the dev server
+npm run dev
+```
+
+The app will be available at `http://localhost:3000` with the API at `http://localhost:8000`.
+
+---
+
+## Conclusion
+
+DesignAI demonstrates that modern AI product engineering is not just about calling an API — it is about composing multiple AI capabilities into a coherent, reliable system. Gemini handles language understanding and multimodal vision. FLUX handles image synthesis. CLIP provides quality feedback. Genetic algorithms explore the prompt space. Fuzzy logic prices the usage fairly. Redis and PostgreSQL keep everything fast and persistent.
+
+The key engineering insight: **each AI service does one thing well**. The platform's value comes from the orchestration layer that connects them — the FastAPI routes that validate, sequence, persist, and respond, and the Next.js frontend that presents the results in a way that feels seamless to the user.

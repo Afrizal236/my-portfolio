@@ -19,6 +19,8 @@ interface ProjectCardCompactProps {
   link?: string;
   techStack?: string[];
   category?: string;
+  /** Optional badge shown on the card image corner (e.g. "Blog") */
+  badge?: string;
 }
 
 export const ProjectCardCompact: React.FC<ProjectCardCompactProps> = ({
@@ -29,6 +31,7 @@ export const ProjectCardCompact: React.FC<ProjectCardCompactProps> = ({
   link,
   techStack,
   category,
+  badge,
 }) => {
   return (
     <SmartLink
@@ -49,9 +52,12 @@ export const ProjectCardCompact: React.FC<ProjectCardCompactProps> = ({
               aspectRatio="16 / 9"
               className={styles.image}
             />
+            {badge && (
+              <span className={styles.badge}>{badge}</span>
+            )}
             <div className={styles.overlay}>
               <Text variant="body-default-xs" className={styles.overlayText}>
-                View Project →
+                {badge === "Blog" ? "Read Post →" : "View Project →"}
               </Text>
             </div>
           </div>

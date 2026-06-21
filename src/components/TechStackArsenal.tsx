@@ -7,38 +7,56 @@ import styles from "./TechStackArsenal.module.scss";
 
 export function TechStackArsenal() {
   const tech = [
-    { name: "Golang", slug: "go" },
+    // Languages
+    { name: "JavaScript", slug: "javascript" },
     { name: "TypeScript", slug: "typescript" },
+    { name: "Python", slug: "python" },
+    { name: "Dart", slug: "dart" },
+    { name: "PHP", slug: "php" },
+    { name: "C++", slug: "cplusplus" },
+
+    // Frontend
+    { name: "React.js", slug: "react" },
+    { name: "Next.js", slug: "nextdotjs" },
+    { name: "Material UI", slug: "mui" },
+    { name: "React Query", slug: "reactquery" },
+    { name: "Axios", slug: "axios" },
+    { name: "Leaflet.js", slug: "leaflet" },
+
+    // Backend & API
+    { name: "Node.js", slug: "nodedotjs" },
     { name: "Express.js", slug: "express" },
     { name: "NestJS", slug: "nestjs" },
-    { name: "Gin Gonic", slug: "gin" },
-    { name: "Next.js", slug: "nextdotjs" },
-    { name: "Nuxt.js", slug: "nuxt" },
-    { name: "React.JS", slug: "react" },
-    { name: "Vue.js", slug: "vuedotjs" },
-    { name: "Apache Kafka", slug: "apachekafka" },
-    { name: "Xendit", slug: "xendit" },
-    { name: "Prisma", slug: "prisma" },
+    { name: "FastAPI", slug: "fastapi" },
+    { name: "Socket.IO", slug: "socketdotio" },
+    { name: "NextAuth.js", slug: "nextauth" },
+
+    // Mobile
+    { name: "Flutter", slug: "flutter" },
+    { name: "Firebase", slug: "firebase" },
+
+    // Database & Storage
     { name: "PostgreSQL", slug: "postgresql" },
-    { name: "MongoDB", slug: "mongodb" },
+    { name: "MySQL", slug: "mysql" },
     { name: "Redis", slug: "redis" },
-    { name: "Kong API Gateway", slug: "kong" },
-    { name: "Cloudinary", slug: "cloudinary" },
+    { name: "SQLite", slug: "sqlite" },
+    { name: "Cloudflare R2", slug: "cloudflare" },
+
+    // AI / ML & Data
+    { name: "PyTorch", slug: "pytorch" },
+    { name: "TensorFlow", slug: "tensorflow" },
+    { name: "scikit-learn", slug: "scikitlearn" },
+    { name: "OpenCV", slug: "opencv" },
+    { name: "Streamlit", slug: "streamlit" },
+    { name: "Google Gemini", slug: "googlegemini" },
+
+    // DevOps & Tools
     { name: "Docker", slug: "docker" },
     { name: "Git", slug: "git" },
-    { name: "Jira", slug: "jira" },
-    { name: "Taskfile", slug: "task" },
-    { name: "JavaScript", slug: "javascript" },
-    { name: "Node.js", slug: "nodedotjs" },
-    // Derived from About page technical skills:
-    { name: "Hapi", slug: "hapi" },
-    { name: "C++", slug: "cplusplus" },
-    { name: "Python", slug: "python" },
-    { name: "TensorFlow", slug: "tensorflow" },
-    { name: "OpenCV", slug: "opencv" },
+    { name: "Figma", slug: "figma" },
   ];
 
-  // Logic to repeat tech list for seamless infinite loop
+  // Duplicate for seamless infinite marquee loop
   const duplicatedTech = [...tech, ...tech];
 
   const renderTrackContent = (isColor = false) => (
@@ -75,7 +93,7 @@ export function TechStackArsenal() {
           {/* Background Layer: Grayscale */}
           {renderTrackContent(false)}
 
-          {/* Foreground Layer: Original Colors (Controlled by CSS mask in the center) */}
+          {/* Foreground Layer: Original Colors (controlled by CSS mask in the center) */}
           <div className={styles.marqueeColorLayer}>
             {renderTrackContent(true)}
           </div>

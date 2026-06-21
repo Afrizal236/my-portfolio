@@ -40,6 +40,22 @@
   width: 100%;
 }
 
+.badge {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  background: var(--accent-solid-strong, #7c3aed);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  z-index: 2;
+  pointer-events: none;
+}
+
 .overlay {
   position: absolute;
   inset: 0;
