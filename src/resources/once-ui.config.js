@@ -1,7 +1,7 @@
 import { home } from "./content";
 
 // IMPORTANT: Replace with your own domain address - it's used for SEO in meta tags and schema
-const baseURL = "https://www.skyyydev.my.id";
+const baseURL = "https://www.ramyd-dev.com/";
 
 const routes = {
   "/": true,
@@ -177,7 +177,7 @@ const schema = {
   type: "Organization",
   name: "Skyyy Portfolio",
   description: home.description,
-  email: "muhammad.wildanya@gmail.com",
+  email: "ramydiaman@gmail.com",
 };
 
 // social links
