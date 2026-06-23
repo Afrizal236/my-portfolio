@@ -18,6 +18,12 @@ techStack:
 category: "Mobile"
 ---
 
+**GitHub Repository:**
+
+```bash
+git clone https://github.com/Afrizal236/Kalkulator-API.git
+```
+
 ## Overview
 
 Building a basic calculator that adds and subtracts is straightforward. Building one that handles trigonometric functions, logarithms, and high-precision computations — with a live API backend and a seamless offline fallback — is where real mobile engineering begins.
@@ -293,13 +299,13 @@ String handleError(dynamic error) {
 
 ### Error Type Comparison
 
-| Error Type | Cause | Handling Strategy |
-|------------|-------|-------------------|
-| SocketException | No internet | Switch to local fallback |
+| Error Type       | Cause              | Handling Strategy        |
+| ---------------- | ------------------ | ------------------------ |
+| SocketException  | No internet        | Switch to local fallback |
 | TimeoutException | API too slow (15s) | Switch to local fallback |
-| FormatException | Invalid expression | Show error message |
-| HTTP Error | API unavailable | Switch to local fallback |
-| Division by zero | User input | Show protected message |
+| FormatException  | Invalid expression | Show error message       |
+| HTTP Error       | API unavailable    | Switch to local fallback |
+| Division by zero | User input         | Show protected message   |
 
 ---
 
