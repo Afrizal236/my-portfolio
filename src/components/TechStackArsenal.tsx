@@ -53,6 +53,10 @@ export function TechStackArsenal() {
     // DevOps & Tools
     { name: "Docker", slug: "docker" },
     { name: "Git", slug: "git" },
+    { name: "GitHub", slug: "github" },
+    { name: "GitLab", slug: "gitlab" },
+    { name: "Vercel", slug: "vercel" },
+    { name: "Cloudflare", slug: "cloudflare" },
     { name: "Figma", slug: "figma" },
   ];
 
@@ -70,10 +74,15 @@ export function TechStackArsenal() {
                 : `https://cdn.simpleicons.org/${t.slug}/gray`
             }
             alt={t.name}
-            className={clsx(styles.techLogo, !isColor && styles.techLogoGrayscale)}
+            className={clsx(
+              styles.techLogo,
+              !isColor && styles.techLogoGrayscale,
+            )}
             loading="lazy"
           />
-          <span className={clsx(styles.techName, isColor && styles.techNameColor)}>
+          <span
+            className={clsx(styles.techName, isColor && styles.techNameColor)}
+          >
             {t.name}
           </span>
         </div>
@@ -83,7 +92,12 @@ export function TechStackArsenal() {
 
   return (
     <RevealFx translateY="16" delay={0.6}>
-      <Flex fillWidth direction="column" gap="24" className={styles.techSection}>
+      <Flex
+        fillWidth
+        direction="column"
+        gap="24"
+        className={styles.techSection}
+      >
         <Flex fillWidth horizontal="center">
           <Heading as="h2" variant="display-strong-xs" wrap="balance">
             Core Tech Stack & Tools
