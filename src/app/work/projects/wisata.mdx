@@ -4,8 +4,7 @@ publishedAt: "2025-12-06"
 summary: "A complete breakdown of building the official Surabaya city government website using Next.js, TypeScript, and a Backend-for-Frontend proxy pattern. Covers BFF architecture, React Query data fetching, Docker deployment, and accessibility features for a public-facing civic platform."
 tag: "Frontend"
 images:
-  - "/images/work/wisata/wisata2.png"
-  - "/images/work/wisata/wisata1.png"
+  - "/images/work/wisata/wisata.png"
 
 team:
   - name: "Afrizal Ramy Diaman"
@@ -24,6 +23,7 @@ category: "Frontend"
 ---
 
 **GitHub Repository:**
+
 ```bash
 git clone https://github.com/Afrizal236/page-wisata-surabaya.go.id.git
 ```
@@ -128,7 +128,7 @@ The BFF layer sits between the browser and the internal Surabaya backend APIs. A
 
 ```typescript
 // utils/axios.config.tsx
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosInstance } from "axios";
 
 const axiosConfig = (useInternalApi: boolean): AxiosInstance => {
   const baseURL = useInternalApi
@@ -138,40 +138,40 @@ const axiosConfig = (useInternalApi: boolean): AxiosInstance => {
   return axios.create({
     baseURL,
     headers: {
-      'Signature': process.env.SIGNATURE,
-      'Content-Type': 'application/json',
+      Signature: process.env.SIGNATURE,
+      "Content-Type": "application/json",
     },
   });
 };
 
 // Use internal Surabaya backend
-export const apiClient    = axiosConfig(true);
+export const apiClient = axiosConfig(true);
 
 // Use WebDisplay backend
-export const wdApiClient  = axiosConfig(false);
+export const wdApiClient = axiosConfig(false);
 ```
 
 ### BFF Proxy Route Example
 
 ```typescript
 // pages/api/data/news.tsx
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { apiClient } from '@/utils/axios.config';
+import type { NextApiRequest, NextApiResponse } from "next";
+import { apiClient } from "@/utils/axios.config";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   try {
     const { category, page = 1, limit = 10 } = req.query;
 
-    const response = await apiClient.get('/news', {
+    const response = await apiClient.get("/news", {
       params: { category, page, limit },
     });
 
     res.status(200).json(response.data);
   } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch news' });
+    res.status(500).json({ message: "Failed to fetch news" });
   }
 }
 ```
@@ -186,7 +186,7 @@ React Query manages all server state — caching, background refetching, and loa
 
 ```typescript
 // utils/services/news.tsx
-import axios from 'axios';
+import axios from "axios";
 
 export interface NewsParams {
   category?: string;
@@ -195,7 +195,7 @@ export interface NewsParams {
 }
 
 export const getNewsList = async (params: NewsParams) => {
-  const response = await axios.get('/api/data/news', { params });
+  const response = await axios.get("/api/data/news", { params });
   return response.data;
 };
 
@@ -254,8 +254,8 @@ The application uses Next.js file-based routing with dynamic segments for detail
 
 ```typescript
 // pages/berita/[slug].tsx
-import { GetServerSideProps } from 'next';
-import { getNewsDetail } from '@/utils/services/news';
+import { GetServerSideProps } from "next";
+import { getNewsDetail } from "@/utils/services/news";
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const slug = params?.slug as string;
@@ -297,22 +297,22 @@ const Layout = ({ children }: LayoutProps) => {
 
 ### Component Reference
 
-| Component | Function |
-|---|---|
-| layout.tsx | Main page wrapper with header and footer |
-| header.tsx | Main navigation and menu |
-| carousel.main.tsx | Hero carousel on home page |
-| news.list.tsx | Article list with categories |
-| news.detail.redesign.tsx | Full article detail view |
-| wisata.tsx | Tourism destination list |
-| destination.tsx | Single destination detail |
-| media.player.video.tsx | Embedded video player |
-| media.player.audio.tsx | Podcast and audio player |
-| infografis.list.tsx | Infographic gallery |
-| search.tsx | Site-wide search |
-| pagination.tsx | Page navigation |
-| accessibility.tsx | Accessibility tools for disabled users |
-| popper.share.tsx | Social media share button |
+| Component                | Function                                 |
+| ------------------------ | ---------------------------------------- |
+| layout.tsx               | Main page wrapper with header and footer |
+| header.tsx               | Main navigation and menu                 |
+| carousel.main.tsx        | Hero carousel on home page               |
+| news.list.tsx            | Article list with categories             |
+| news.detail.redesign.tsx | Full article detail view                 |
+| wisata.tsx               | Tourism destination list                 |
+| destination.tsx          | Single destination detail                |
+| media.player.video.tsx   | Embedded video player                    |
+| media.player.audio.tsx   | Podcast and audio player                 |
+| infografis.list.tsx      | Infographic gallery                      |
+| search.tsx               | Site-wide search                         |
+| pagination.tsx           | Page navigation                          |
+| accessibility.tsx        | Accessibility tools for disabled users   |
+| popper.share.tsx         | Social media share button                |
 
 ---
 
@@ -365,13 +365,13 @@ CMD ["node", "server.js"]
 
 ### Docker Configuration
 
-| Parameter | Value |
-|---|---|
-| Base Image | node:18-alpine |
-| Exposed Port | 3005 |
-| Output Mode | standalone (Next.js) |
-| Volume | uploads/images mapped to public/images |
-| Restart Policy | always |
+| Parameter      | Value                                  |
+| -------------- | -------------------------------------- |
+| Base Image     | node:18-alpine                         |
+| Exposed Port   | 3005                                   |
+| Output Mode    | standalone (Next.js)                   |
+| Volume         | uploads/images mapped to public/images |
+| Restart Policy | always                                 |
 
 ---
 
@@ -384,14 +384,14 @@ Tune stale time per data type — news changes frequently, menus almost never:
 ```typescript
 // News: short cache, changes often
 useQuery({
-  queryKey: ['news'],
+  queryKey: ["news"],
   queryFn: getNewsList,
-  staleTime: 2 * 60 * 1000,  // 2 minutes
+  staleTime: 2 * 60 * 1000, // 2 minutes
 });
 
 // Navigation menu: long cache, rarely changes
 useQuery({
-  queryKey: ['menu'],
+  queryKey: ["menu"],
   queryFn: getMenu,
   staleTime: 60 * 60 * 1000, // 1 hour
 });
@@ -402,10 +402,10 @@ useQuery({
 ```javascript
 // headers.js — HTTP security headers
 const securityHeaders = [
-  { key: 'X-DNS-Prefetch-Control',  value: 'on' },
-  { key: 'X-Frame-Options',         value: 'SAMEORIGIN' },
-  { key: 'X-Content-Type-Options',  value: 'nosniff' },
-  { key: 'Referrer-Policy',         value: 'strict-origin-when-cross-origin' },
+  { key: "X-DNS-Prefetch-Control", value: "on" },
+  { key: "X-Frame-Options", value: "SAMEORIGIN" },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
 ];
 
 module.exports = securityHeaders;
