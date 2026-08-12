@@ -296,7 +296,11 @@ const about = {
       },
       {
         title: "DevOps & Tools",
-        description: <>Docker | Git | XAMPP | Figma</>,
+        description: (
+          <>
+            Docker | Git | GitHub | GitLab | Vercel | Cloudflare | XAMPP | Figma
+          </>
+        ),
         images: [],
       },
     ],
