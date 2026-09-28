@@ -35,12 +35,12 @@ const social = [
   {
     name: "LinkedIn",
     icon: "linkedin",
-    link: "",
+    link: "https://www.linkedin.com/in/afrizal-ramy-diaman-18bb17439/",
   },
   {
     name: "Instagram",
     icon: "instagram",
-    link: "",
+    link: "https://www.instagram.com/ramydiaman8?stkn=czh3OHptbWhkbjRs",
   },
   {
     name: "Email",
